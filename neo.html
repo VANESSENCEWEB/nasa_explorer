@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEO Watch · NASA Explorer</title>
+
+  <!-- fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+
+  <!-- tailwind via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            nasa: '#fc3d21',
+            glow: '#06b6d4'
+          },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body { background: #0a0e27; }
+  </style>
+</head>
+
+<body class="font-sans text-slate-200 min-h-screen">
+
+  <!-- navbar -->
+  <nav class="border-b border-white/10 py-4">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
+          <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
+          <g>
+            <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
+          </g>
+        </svg>
+        <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
+      </a>
+      <div class="flex gap-7 text-xs">
+        <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+        <a href="neo.html" class="text-glow font-medium">NEO Watch</a>
+        <a href="#" class="text-slate-500 cursor-not-allowed">Mars Gallery</a>
+        <a href="#" class="text-slate-500 cursor-not-allowed">Favoritos</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- conteúdo da página -->
+  <main class="max-w-6xl mx-auto px-6 py-12">
+
+    <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NEAR-EARTH OBJECT WATCH</div>
+    <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
+      Asteroides próximos da Terra
+    </h1>
+
+    <p class="text-slate-400 leading-relaxed max-w-3xl mb-12">
+      Lista de asteroides que vão passar perto da Terra nos próximos dias,
+      usando dados da API NEO da NASA. Os marcados como "perigosos" são
+      aqueles que a NASA classifica como potencialmente arriscados pela
+      combinação de tamanho e proximidade.
+    </p>
+
+    <!-- aqui vai entrar a tabela depois -->
+    <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center">
+      <div class="text-xs font-mono text-slate-500 tracking-[0.15em]">
+        [ EM CONSTRUÇÃO ]
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-white/5 py-6 text-center">
+    <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
+      NASA EXPLORER · 2026
+    </div>
+  </footer>
+
+</body>
+</html>
