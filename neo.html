@@ -8,7 +8,7 @@
   <!-- fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
   <!-- tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -59,27 +59,63 @@
     </div>
   </nav>
 
-  <!-- conteúdo da página -->
   <main class="max-w-6xl mx-auto px-6 py-12">
 
+    <!-- cabeçalho da página -->
     <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NEAR-EARTH OBJECT WATCH</div>
     <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
       Asteroides próximos da Terra
     </h1>
-
-    <p class="text-slate-400 leading-relaxed max-w-3xl mb-12">
-      Lista de asteroides que vão passar perto da Terra nos próximos dias,
-      usando dados da API NEO da NASA. Os marcados como "perigosos" são
-      aqueles que a NASA classifica como potencialmente arriscados pela
-      combinação de tamanho e proximidade.
+    <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
+      Asteroides que vão passar perto da Terra nos próximos 7 dias,
+      ordenados do mais próximo pro mais distante. Os marcados como
+      "perigosos" são potencialmente arriscados pela combinação de
+      tamanho e proximidade.
     </p>
 
-    <!-- aqui vai entrar a tabela depois -->
-    <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center">
-      <div class="text-xs font-mono text-slate-500 tracking-[0.15em]">
-        [ EM CONSTRUÇÃO ]
-      </div>
+    <!-- mensagem de carregando / erro -->
+    <div id="status" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-8">
+      CARREGANDO ASTEROIDES...
     </div>
+
+    <!-- stats -->
+    <section id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 hidden">
+      <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+        <div class="text-[10px] text-slate-400 tracking-widest uppercase mb-2">Total</div>
+        <div class="text-2xl font-mono font-medium text-white" id="stat-total">—</div>
+      </div>
+      <div class="bg-nasa/[0.05] border border-nasa/30 rounded-xl p-4">
+        <div class="text-[10px] text-red-300 tracking-widest uppercase mb-2">Perigosos</div>
+        <div class="text-2xl font-mono font-medium text-white" id="stat-perigosos">—</div>
+      </div>
+      <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+        <div class="text-[10px] text-slate-400 tracking-widest uppercase mb-2">Mais próximo</div>
+        <div class="text-2xl font-mono font-medium text-white" id="stat-proximo">—</div>
+      </div>
+      <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
+        <div class="text-[10px] text-slate-400 tracking-widest uppercase mb-2">Mais rápido</div>
+        <div class="text-2xl font-mono font-medium text-white" id="stat-rapido">—</div>
+      </div>
+    </section>
+
+    <!-- tabela -->
+    <section id="tabela-container" class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-12 hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs">
+          <thead>
+            <tr class="text-[10px] text-slate-500 tracking-widest uppercase border-b border-white/10">
+              <th class="text-left py-3 px-2 font-medium">Nome</th>
+              <th class="text-left py-3 px-2 font-medium">Data</th>
+              <th class="text-left py-3 px-2 font-medium">Diâmetro</th>
+              <th class="text-left py-3 px-2 font-medium">Distância</th>
+              <th class="text-left py-3 px-2 font-medium">Velocidade</th>
+              <th class="text-left py-3 px-2 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-corpo"></tbody>
+        </table>
+      </div>
+    </section>
 
   </main>
 
@@ -88,6 +124,93 @@
       NASA EXPLORER · 2026
     </div>
   </footer>
+
+  <script type="module">
+    import { fetchNeoFeed } from './js/nasa.js';
+
+    // Elementos da página que vou preencher.
+    const status = document.getElementById('status');
+    const stats = document.getElementById('stats');
+    const tabelaContainer = document.getElementById('tabela-container');
+    const tabelaCorpo = document.getElementById('tabela-corpo');
+
+    // Calcula o intervalo de 7 dias (de hoje até 6 dias atrás).
+    // A NASA aceita no máximo 7 dias por requisição.
+    function getIntervaloPadrao() {
+      const hoje = new Date();
+      const inicio = new Date();
+      inicio.setDate(hoje.getDate() - 6);
+
+      // Converte pra formato YYYY-MM-DD.
+      return {
+        inicio: inicio.toISOString().split('T')[0],
+        fim: hoje.toISOString().split('T')[0]
+      };
+    }
+
+    // Formata a data pro padrão brasileiro (ex: "13 mai").
+    function formatarData(isoDate) {
+      return new Date(isoDate + 'T00:00:00').toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: 'short'
+      });
+    }
+
+    // Função principal que carrega tudo.
+    async function carregar() {
+      try {
+        const { inicio, fim } = getIntervaloPadrao();
+        const asteroides = await fetchNeoFeed(inicio, fim);
+
+        // Esconde o "carregando" e mostra o conteúdo.
+        status.classList.add('hidden');
+        stats.classList.remove('hidden');
+        tabelaContainer.classList.remove('hidden');
+
+        // Preenche os stats no topo.
+        const perigosos = asteroides.filter(a => a.perigoso);
+        document.getElementById('stat-total').textContent = asteroides.length;
+        document.getElementById('stat-perigosos').textContent = perigosos.length;
+        document.getElementById('stat-proximo').textContent =
+          asteroides[0].distancia_lunar.toFixed(1) + ' LD';
+
+        const maisRapido = Math.max(...asteroides.map(a => a.velocidade));
+        document.getElementById('stat-rapido').textContent =
+          maisRapido.toFixed(1) + ' km/s';
+
+        
+        // Monta a tabela
+        // Garanto que todos os perigosos apareçam, e completo o resto
+        // com os mais próximos até chegar em 20 linhas.
+        const perigososOrdenados = asteroides.filter(a => a.perigoso);
+        const segurosOrdenados = asteroides.filter(a => !a.perigoso);
+        const top20 = [...perigososOrdenados, ...segurosOrdenados].slice(0, 20);
+
+        tabelaCorpo.innerHTML = top20.map(a => {
+          const tag = a.perigoso
+            ? '<span class="bg-red-500/15 text-red-300 px-2 py-0.5 rounded text-[10px] tracking-wider">PERIGOSO</span>'
+            : '<span class="bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded text-[10px] tracking-wider">SEGURO</span>';
+
+          return `
+            <tr class="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
+              <td class="py-2.5 px-2 text-white">${a.nome}</td>
+              <td class="py-2.5 px-2 text-slate-400">${formatarData(a.data)}</td>
+              <td class="py-2.5 px-2 font-mono text-slate-300">${a.diametro} m</td>
+              <td class="py-2.5 px-2 font-mono text-slate-300">${a.distancia_lunar.toFixed(2)} LD</td>
+              <td class="py-2.5 px-2 font-mono text-slate-300">${a.velocidade.toFixed(1)} km/s</td>
+              <td class="py-2.5 px-2">${tag}</td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (erro) {
+        console.error(erro);
+        status.innerHTML = `<span class="text-nasa">ERRO · ${erro.message}</span>`;
+      }
+    }
+
+    carregar();
+  </script>
 
 </body>
 </html>
