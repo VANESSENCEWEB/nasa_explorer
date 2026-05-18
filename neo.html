@@ -14,7 +14,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
 <!-- Chart.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-  
+
   <script>
     tailwind.config = {
       theme: {
@@ -102,6 +102,14 @@
       </div>
     </section>
 
+    <!-- gráficos chart js -->
+<section id="graficos" class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-6 hidden">
+  <h3 class="text-sm font-medium text-white mb-4">Asteroides por dia</h3>
+  <div style="height: 240px;">
+    <canvas id="grafico-barras"></canvas>
+  </div>
+</section>
+
     <!-- tabela -->
     <section id="tabela-container" class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-12 hidden">
       <div class="overflow-x-auto">
@@ -182,6 +190,76 @@
         document.getElementById('stat-rapido').textContent =
           maisRapido.toFixed(1) + ' km/s';
 
+
+          // Mostra a seção de gráficos.
+document.getElementById('graficos').classList.remove('hidden');
+
+// Agrupa os asteroides por data pra montar o gráfico de barras.
+// Quero saber quantos foram seguros e quantos foram perigosos em cada dia.
+const contagem_por_dia = {};
+
+for (const a of asteroides) {
+  if (!contagem_por_dia[a.data]) {
+    contagem_por_dia[a.data] = { seguros: 0, perigosos: 0 };
+  }
+  if (a.perigoso) {
+    contagem_por_dia[a.data].perigosos++;
+  } else {
+    contagem_por_dia[a.data].seguros++;
+  }
+}
+
+// Pega as datas em ordem e separa os números em dois arrays
+// (um pra cada tipo de barra empilhada).
+const datas_ordenadas = Object.keys(contagem_por_dia).sort();
+const labels = datas_ordenadas.map(formatarData);
+const dados_seguros = datas_ordenadas.map(d => contagem_por_dia[d].seguros);
+const dados_perigosos = datas_ordenadas.map(d => contagem_por_dia[d].perigosos);
+
+// Cria o gráfico de barras.
+new Chart(document.getElementById('grafico-barras'), {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [
+      {
+        label: 'Seguros',
+        data: dados_seguros,
+        backgroundColor: '#06b6d4',
+        borderRadius: 3
+      },
+      {
+        label: 'Perigosos',
+        data: dados_perigosos,
+        backgroundColor: '#fc3d21',
+        borderRadius: 3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 }
+      }
+    },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { display: false },
+        ticks: { color: '#64748b', font: { size: 10 } }
+      },
+      y: {
+        stacked: true,
+        grid: { color: 'rgba(255,255,255,0.04)' },
+        ticks: { color: '#64748b', font: { size: 10 }, stepSize: 1 },
+        beginAtZero: true
+      }
+    }
+  }
+});
         
         // Monta a tabela
         // Garanto que todos os perigosos apareçam, e completo o resto

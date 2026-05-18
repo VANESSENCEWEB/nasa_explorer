@@ -4,6 +4,11 @@ Dashboard com dados públicos da NASA. Projeto da disciplina de **PROGRAMAÇÃO 
 
 UNICAP · 2º período de Sistemas para Internet · Professor: Gabriel Fernandes.
 
+## Deploy
+
+🌐 [nasa-explor.netlify.app](https://nasa-explor.netlify.app)
+
+
 ## Sobre
 
 Painel que junta APIs gratuitas da NASA num lugar só:
