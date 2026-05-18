@@ -1,12 +1,11 @@
 // Cena 3D da Terra para a página NEO.
-// Por enquanto só a Terra rotacionando com estrelas de fundo.
-// Os asteroides vão entrar no próximo commit.
+// Mostra a Terra rotacionando + estrelas + asteroides orbitando.
 
 import * as THREE from 'three';
 
 // Função principal que cria a cena.
-// Recebe o canvas onde a Terra vai aparecer.
-export function criarCenaDaTerra(canvas) {
+// Recebe o canvas onde a Terra vai aparecer, e a lista de asteroides.
+export function criarCenaDaTerra(canvas, asteroides) {
 
   // Tamanho do canvas (pega o que tá definido no CSS).
   const largura = canvas.clientWidth;
@@ -18,26 +17,24 @@ export function criarCenaDaTerra(canvas) {
 
   // ---- CAMERA ----
   // Define como a gente "olha" pra cena.
-  // Os parâmetros são: ângulo de visão, proporção, distância mínima, distância máxima.
   const camera = new THREE.PerspectiveCamera(40, largura / altura, 0.1, 1000);
-  camera.position.set(0, 0.5, 8); // posição: levemente acima e afastado
+  camera.position.set(0, 0.5, 8);
 
   // ---- RENDERER ----
   // É o que desenha a cena no canvas.
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
-    antialias: true,  // bordas suaves
-    alpha: true       // fundo transparente
+    antialias: true,
+    alpha: true
   });
   renderer.setSize(largura, altura, false);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   // ---- TERRA ----
-  // Esfera azul que representa a Terra.
   const terra = new THREE.Mesh(
-    new THREE.SphereGeometry(1.7, 48, 48), // raio 1.7, com 48 segmentos
+    new THREE.SphereGeometry(1.7, 48, 48),
     new THREE.MeshStandardMaterial({
-      color: 0x1e3a8a,  // azul escuro
+      color: 0x1e3a8a,
       roughness: 0.85,
       metalness: 0.1
     })
@@ -45,11 +42,10 @@ export function criarCenaDaTerra(canvas) {
   scene.add(terra);
 
   // ---- WIREFRAME ----
-  // Uma esfera de "grade" por cima da terra, dá um visual de radar/satélite.
   const wireframe = new THREE.Mesh(
     new THREE.SphereGeometry(1.72, 24, 14),
     new THREE.MeshBasicMaterial({
-      color: 0x06b6d4,  // ciano
+      color: 0x06b6d4,
       wireframe: true,
       transparent: true,
       opacity: 0.18
@@ -58,26 +54,23 @@ export function criarCenaDaTerra(canvas) {
   scene.add(wireframe);
 
   // ---- ATMOSFERA ----
-  // Esfera maior por fora, com material por dentro, simula o brilho da atmosfera.
   const atmosfera = new THREE.Mesh(
     new THREE.SphereGeometry(1.95, 32, 32),
     new THREE.MeshBasicMaterial({
       color: 0x06b6d4,
       transparent: true,
       opacity: 0.08,
-      side: THREE.BackSide  // renderiza só o lado de dentro
+      side: THREE.BackSide
     })
   );
   scene.add(atmosfera);
 
   // ---- ESTRELAS ----
-  // 2000 pontinhos brancos distribuídos numa esfera enorme em volta.
   const estrelasGeometry = new THREE.BufferGeometry();
   const totalEstrelas = 2000;
   const posicoes = new Float32Array(totalEstrelas * 3);
 
   for (let i = 0; i < totalEstrelas; i++) {
-    // Posição aleatória dentro de uma esfera grande.
     const raio = 50 + Math.random() * 50;
     const theta = Math.random() * Math.PI * 2;
     const phi = Math.acos(2 * Math.random() - 1);
@@ -97,24 +90,76 @@ export function criarCenaDaTerra(canvas) {
   }));
   scene.add(estrelas);
 
+  // ---- ASTEROIDES ----
+  // Pego no máximo 30 asteroides pra não poluir a cena.
+  const listaAsteroides3D = [];
+  const limite = Math.min(asteroides.length, 30);
+
+  for (let i = 0; i < limite; i++) {
+    const a = asteroides[i];
+
+    // Tamanho da esfera depende do diâmetro real do asteroide,
+    // mas com limites pra não ficarem invisíveis ou gigantes.
+    const tamanho = Math.max(0.04, Math.min(0.15, a.diametro / 2000));
+
+    // Distância da Terra também varia, e não é a real (LD)
+    // porque ficaria absurda em escala. Comprimo pra ficar visível.
+    const distancia = 2.3 + Math.min(a.distancia_lunar / 4, 2);
+
+    const cor = a.perigoso ? 0xfc3d21 : 0xffffff;
+
+    const mesh = new THREE.Mesh(
+      new THREE.SphereGeometry(tamanho, 12, 12),
+      new THREE.MeshBasicMaterial({ color: cor })
+    );
+
+    // Cada asteroide começa numa posição diferente da órbita.
+    mesh.userData = {
+      angulo: (i / limite) * Math.PI * 2,
+      distancia: distancia,
+      velocidade: 0.2 + Math.random() * 0.4,
+      perigoso: a.perigoso,
+      inclinacao: (Math.random() - 0.5) * 0.6
+    };
+
+    scene.add(mesh);
+    listaAsteroides3D.push(mesh);
+  }
+
   // ---- LUZES ----
-  // Sem luz, a Terra fica toda preta (porque ela usa MeshStandardMaterial).
   const sol = new THREE.DirectionalLight(0xffffff, 1.3);
   sol.position.set(5, 2, 4);
   scene.add(sol);
 
-  // Luz ambiente fraca pra não ficar totalmente preto no lado escuro.
   const luzAmbiente = new THREE.AmbientLight(0x4060a0, 0.4);
   scene.add(luzAmbiente);
 
   // ---- LOOP DE ANIMAÇÃO ----
-  // Função que roda 60 vezes por segundo pra desenhar a cena.
+  let tempo = 0;
+
   function animar() {
     requestAnimationFrame(animar);
+    tempo += 0.01;
 
-    // Faz a Terra rotacionar um pouquinho a cada frame.
+    // Rotação da Terra.
     terra.rotation.y += 0.002;
     wireframe.rotation.y += 0.0012;
+
+    // Move os asteroides em suas órbitas.
+    for (const mesh of listaAsteroides3D) {
+      const dados = mesh.userData;
+      const a = dados.angulo + tempo * dados.velocidade;
+
+      mesh.position.x = Math.cos(a) * dados.distancia;
+      mesh.position.z = Math.sin(a) * dados.distancia;
+      mesh.position.y = Math.sin(a * 0.7 + dados.inclinacao) * 0.4;
+
+      // Asteroides perigosos pulsam (ficam maiores e menores).
+      if (dados.perigoso) {
+        const escala = 1 + Math.sin(tempo * 4) * 0.35;
+        mesh.scale.set(escala, escala, escala);
+      }
+    }
 
     renderer.render(scene, camera);
   }

@@ -198,8 +198,7 @@
 
     // Função principal que carrega tudo.
     async function carregar() {
-      // Cria a cena 3D da Terra.
-      criarCenaDaTerra(document.getElementById('earth-canvas'));
+     
 
       try {
         const { inicio, fim } = getIntervaloPadrao();
@@ -220,6 +219,9 @@
         const maisRapido = Math.max(...asteroides.map(a => a.velocidade));
         document.getElementById('stat-rapido').textContent =
           maisRapido.toFixed(1) + ' km/s';
+
+          // Cria a cena 3D da Terra com os asteroides reais.
+        criarCenaDaTerra(document.getElementById('earth-canvas'), asteroides);
 
         // Mostra a seção de gráficos.
         document.getElementById('graficos').classList.remove('hidden');
