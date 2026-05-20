@@ -6,7 +6,15 @@ UNICAP · 2º período de Sistemas para Internet · Professor: Gabriel Fernandes
 
 ## Deploy
 
-🌐 [nasa-explor.netlify.app](https://nasa-explor.netlify.app)
+```bash
+🌐 Acesse: https://www.nasa-explor.netlify.app
+```
+
+
+<p align="center">
+  <img src="./screenshot-nasa-explorer.png" alt="Nasa Explorer Preview" width="100%">
+</p>
+
 
 
 ## Sobre
