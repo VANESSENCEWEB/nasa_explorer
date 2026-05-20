@@ -76,3 +76,32 @@ export async function fetchNeoFeed(dataInicio, dataFim) {
 
   return lista;
 }
+// Busca fotos do rover Curiosity num "sol" específico (dia marciano).
+// Sol 1 = primeiro dia do rover em Marte (agosto/2012).
+// O Curiosity já está em mais de 4000 sóis, então qualquer número
+// até esse limite dá fotos.
+export async function fetchMarsPhotos(sol) {
+  const url = `${BASE_URL}/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=${API_KEY}`;
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error('Erro ao buscar fotos do Marte: ' + response.status);
+  }
+
+  const data = await response.json();
+
+  // A API retorna { photos: [...] }.
+  // Vou simplificar cada foto pra só ter os campos que eu uso.
+  const fotos = data.photos.map(p => ({
+    id: p.id,
+    imagem: p.img_src,
+    data_terra: p.earth_date,
+    sol: p.sol,
+    camera_codigo: p.camera.name,
+    camera_nome: p.camera.full_name,
+    rover: p.rover.name
+  }));
+
+  return fotos;
+}
