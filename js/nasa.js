@@ -1,9 +1,7 @@
-
 // Cliente da API da NASA.
 // Aqui ficam todas as funções que conversam com a NASA.
 
 // Minha chave da NASA (gerei em api.nasa.gov).
-// TODO: usar DEMO_KEY enquanto não termino o projeto, depois troco pela minha.
 const API_KEY = '70IcSHfoJNS203UhQt7rOczSFwOskdpDyUhoiZ1P';
 
 
@@ -76,32 +74,36 @@ export async function fetchNeoFeed(dataInicio, dataFim) {
 
   return lista;
 }
-// Busca fotos do rover Curiosity num "sol" específico (dia marciano).
-// Sol 1 = primeiro dia do rover em Marte (agosto/2012).
-// O Curiosity já está em mais de 4000 sóis, então qualquer número
-// até esse limite dá fotos.
-export async function fetchMarsPhotos(sol) {
-  const url = `${BASE_URL}/mars-photos/api/v1/rovers/curiosity/photos?sol=${sol}&api_key=${API_KEY}`;
+
+// Busca imagens da NASA Image Library com base num termo de busca.
+// Essa API não precisa de chave de API e tem mais de 150 mil imagens.
+// Ex: buscarImagensNasa('mars rover') retorna fotos do rover.
+export async function buscarImagensNasa(termo) {
+  const url = `https://images-api.nasa.gov/search?q=${encodeURIComponent(termo)}&media_type=image`;
 
   const response = await fetch(url);
 
   if (!response.ok) {
-    throw new Error('Erro ao buscar fotos do Marte: ' + response.status);
+    throw new Error('Erro ao buscar imagens: ' + response.status);
   }
 
   const data = await response.json();
 
-  // A API retorna { photos: [...] }.
-  // Vou simplificar cada foto pra só ter os campos que eu uso.
-  const fotos = data.photos.map(p => ({
-    id: p.id,
-    imagem: p.img_src,
-    data_terra: p.earth_date,
-    sol: p.sol,
-    camera_codigo: p.camera.name,
-    camera_nome: p.camera.full_name,
-    rover: p.rover.name
-  }));
+  // A API retorna uma estrutura aninhada chata.
+  // Eu simplifico cada item pra só ter o que vou usar.
+  const itens = data.collection.items.map(item => {
+    const info = item.data[0];
+    const link = item.links ? item.links[0] : null;
 
-  return fotos;
+    return {
+      id: info.nasa_id,
+      titulo: info.title,
+      descricao: info.description || '',
+      data: info.date_created ? info.date_created.split('T')[0] : '',
+      imagem: link ? link.href : ''
+    };
+  });
+
+  // Filtra os que não vieram com imagem.
+  return itens.filter(i => i.imagem !== '');
 }

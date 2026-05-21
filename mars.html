@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mars Gallery · NASA Explorer</title>
+  <title>Image Library · NASA Explorer</title>
 
   <!-- fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -53,7 +53,7 @@
       <div class="flex gap-7 text-xs">
         <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
         <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
-        <a href="mars.html" class="text-glow font-medium">Mars Gallery</a>
+        <a href="mars.html" class="text-glow font-medium">Image Library</a>
         <a href="#" class="text-slate-500 cursor-not-allowed">Favoritos</a>
       </div>
     </div>
@@ -62,22 +62,52 @@
   <main class="max-w-6xl mx-auto px-6 py-12">
 
     <!-- cabeçalho da página -->
-    <div class="text-[11px] text-glow tracking-[0.2em] mb-3">MARS ROVER PHOTOS</div>
+    <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NASA IMAGE LIBRARY</div>
     <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
-      Fotos do Marte
+      Galeria de imagens da NASA
     </h1>
-    <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
-      Fotos enviadas pelo rover <strong>Curiosity</strong> direto da superfície
-      de Marte. O Curiosity está em Marte desde 2012 e já enviou mais de 700
-      mil imagens. Cada "sol" é um dia marciano (24h e 39min terrestres).
+    <p class="text-slate-400 leading-relaxed max-w-3xl mb-8">
+      Mais de 150 mil imagens do acervo oficial da NASA — missões espaciais,
+      planetas, galáxias e momentos históricos da exploração. Use a busca
+      abaixo pra pesquisar o que quiser.
     </p>
 
-    <!-- aqui vai a galeria depois -->
-    <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-8 text-center">
-      <div class="text-xs font-mono text-slate-500 tracking-[0.15em]">
-        [ EM CONSTRUÇÃO ]
-      </div>
+    <!-- barra de busca -->
+    <form id="form-busca" class="flex gap-2 mb-3 max-w-2xl">
+      <input
+        type="text"
+        id="campo-busca"
+        placeholder="Buscar... ex: apollo 11, mars rover, jupiter, nebula"
+        class="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-glow transition-colors"
+      />
+      <button
+        type="submit"
+        class="bg-nasa text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition"
+      >
+        Buscar
+      </button>
+    </form>
+
+    <!-- sugestões de busca rápida -->
+    <div class="flex flex-wrap gap-2 mb-8">
+      <span class="text-[10px] font-mono text-slate-500 tracking-widest uppercase mr-1 self-center">Populares:</span>
+      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="mars rover">mars rover</button>
+      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="apollo 11">apollo 11</button>
+      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="jupiter">jupiter</button>
+      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="nebula">nebula</button>
+      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="saturn">saturn</button>
+      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="iss">ISS</button>
     </div>
+
+    <!-- info -->
+    <div id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6">
+      CARREGANDO IMAGENS...
+    </div>
+
+    <!-- grade de fotos -->
+    <section id="galeria" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
+      <!-- preenchido pelo JS -->
+    </section>
 
   </main>
 
@@ -86,6 +116,76 @@
       NASA EXPLORER · 2026
     </div>
   </footer>
+
+  <script type="module">
+    import { buscarImagensNasa } from './js/nasa.js';
+
+    const form = document.getElementById('form-busca');
+    const campo = document.getElementById('campo-busca');
+    const info = document.getElementById('info');
+    const galeria = document.getElementById('galeria');
+    const sugestoes = document.querySelectorAll('.sugestao');
+
+    // Faz a busca e mostra os resultados na grade.
+    async function buscar(termo) {
+      info.textContent = `BUSCANDO POR "${termo}"...`;
+      galeria.innerHTML = '';
+
+      try {
+        const itens = await buscarImagensNasa(termo);
+
+        if (itens.length === 0) {
+          info.innerHTML = `<span class="text-slate-400">Nenhuma imagem encontrada pra "${termo}". Tenta outra busca.</span>`;
+          return;
+        }
+
+        // Mostra no máximo 24 pra não pesar a página.
+        const itensMostrados = itens.slice(0, 24);
+        info.textContent = `${itensMostrados.length} DE ${itens.length} IMAGENS · BUSCA: "${termo}"`;
+
+        // Monta a grade.
+        galeria.innerHTML = itensMostrados.map(i => `
+          <div class="group relative bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden hover:border-white/30 transition-colors">
+            <img
+              src="${i.imagem}"
+              alt="${i.titulo}"
+              loading="lazy"
+              class="w-full aspect-square object-cover"
+            />
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div class="text-[10px] font-mono text-glow tracking-widest mb-1">${i.data}</div>
+              <div class="text-xs text-white line-clamp-2">${i.titulo}</div>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (erro) {
+        console.error(erro);
+        info.innerHTML = `<span class="text-nasa">ERRO · ${erro.message}</span>`;
+      }
+    }
+
+    // Quando o usuário envia o formulário (clica em Buscar ou aperta Enter).
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const termo = campo.value.trim();
+      if (termo) {
+        buscar(termo);
+      }
+    });
+
+    // Quando o usuário clica numa das sugestões rápidas.
+    sugestoes.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const termo = btn.dataset.termo;
+        campo.value = termo;
+        buscar(termo);
+      });
+    });
+
+    // Busca inicial ao abrir a página.
+    buscar('mars rover');
+  </script>
 
 </body>
 </html>
