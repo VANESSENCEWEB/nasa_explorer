@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Favoritos · NASA Explorer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    body { background: #0a0e27; }
+  </style>
+</head>
+
+<body class="font-sans text-slate-200 min-h-screen">
+
+  <!-- navbar -->
+  <nav class="border-b border-white/10 py-4">
+    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-2.5 group">
+        <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
+          <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
+          <g>
+            <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
+            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
+          </g>
+        </svg>
+        <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
+      </a>
+      <div class="flex gap-7 text-xs">
+        <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+        <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
+        <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
+        <a href="favoritos.html" class="text-glow font-medium">Favoritos</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-6 py-12">
+
+    <div class="text-[11px] text-glow tracking-[0.2em] mb-3">MEUS FAVORITOS</div>
+    <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
+      Coleção pessoal
+    </h1>
+    <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
+      Tudo que você marcou como favorito está salvo aqui. Os dados ficam
+      no <strong>Back4app</strong>, então não somem mesmo se fechar o navegador.
+      Você pode adicionar uma nota pessoal e remover quando quiser.
+    </p>
+
+    <div id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6">
+      CARREGANDO FAVORITOS...
+    </div>
+
+    <section id="lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- preenchido pelo JS -->
+    </section>
+
+    <div id="vazio" class="hidden text-center py-20">
+      <div class="text-slate-500 text-sm mb-2">Nenhum favorito ainda.</div>
+      <div class="text-slate-600 text-xs">
+        Vá até <a href="index.html" class="text-glow hover:underline">Home</a>,
+        <a href="neo.html" class="text-glow hover:underline">NEO Watch</a> ou
+        <a href="mars.html" class="text-glow hover:underline">Image Library</a>
+        e clique nas estrelas pra começar.
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="border-t border-white/5 py-6 text-center">
+    <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
+      NASA EXPLORER · 2026
+    </div>
+  </footer>
+
+  <script type="module">
+    import { listarFavoritos, atualizarNota, deletarFavorito } from './js/parse.js';
+
+    const info = document.getElementById('info');
+    const lista = document.getElementById('lista');
+    const vazio = document.getElementById('vazio');
+
+    async function carregar() {
+      try {
+        const favoritos = await listarFavoritos();
+
+        if (favoritos.length === 0) {
+          info.classList.add('hidden');
+          vazio.classList.remove('hidden');
+          return;
+        }
+
+        info.textContent = `${favoritos.length} ${favoritos.length === 1 ? 'FAVORITO' : 'FAVORITOS'} SALVOS NO BACK4APP`;
+
+        lista.innerHTML = favoritos.map(f => {
+          const dataFormatada = new Date(f.createdAt).toLocaleDateString('pt-BR');
+          const tipoLabel = {
+            apod: 'FOTO ASTRONÔMICA',
+            neo: 'ASTEROIDE',
+            image: 'IMAGEM'
+          }[f.tipo] || f.tipo.toUpperCase();
+
+          const imagemHtml = f.imageUrl
+            ? `<img src="${f.imageUrl}" alt="${f.titulo}" class="w-full aspect-video object-cover" loading="lazy" />`
+            : `<div class="w-full aspect-video bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
+                 <div class="text-3xl">${f.tipo === 'neo' ? '☄️' : '✨'}</div>
+               </div>`;
+
+          return `
+            <div class="bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-colors" data-id="${f.id}">
+              ${imagemHtml}
+              <div class="p-4">
+                <div class="text-[10px] font-mono text-glow tracking-widest mb-2">${tipoLabel} · ${dataFormatada}</div>
+                <h3 class="text-sm text-white font-medium mb-3 line-clamp-2">${f.titulo}</h3>
+
+                <textarea
+                  data-id="${f.id}"
+                  class="nota w-full bg-white/[0.03] border border-white/10 rounded-lg p-2 text-xs text-slate-300 placeholder-slate-600 focus:outline-none focus:border-glow transition-colors resize-none"
+                  placeholder="Sua nota pessoal..."
+                  rows="2"
+                >${f.userNote || ''}</textarea>
+
+                <div class="flex gap-2 mt-3">
+                  <button data-id="${f.id}" class="btn-salvar text-[11px] bg-glow/10 border border-glow/30 text-glow rounded px-3 py-1.5 hover:bg-glow/20 transition flex-1">
+                    Salvar nota
+                  </button>
+                  <button data-id="${f.id}" class="btn-deletar text-[11px] bg-nasa/10 border border-nasa/30 text-red-300 rounded px-3 py-1.5 hover:bg-nasa/20 transition">
+                    Remover
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        // Eventos pros botões de salvar.
+        document.querySelectorAll('.btn-salvar').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const textarea = document.querySelector(`textarea.nota[data-id="${id}"]`);
+            const novaNota = textarea.value;
+
+            btn.textContent = 'Salvando...';
+            btn.disabled = true;
+
+            try {
+              await atualizarNota(id, novaNota);
+              btn.textContent = 'Salvo!';
+              setTimeout(() => {
+                btn.textContent = 'Salvar nota';
+                btn.disabled = false;
+              }, 1500);
+            } catch (e) {
+              btn.textContent = 'Erro';
+              console.error(e);
+            }
+          });
+        });
+
+        // Eventos pros botões de deletar.
+        document.querySelectorAll('.btn-deletar').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('Remover esse favorito?')) return;
+
+            const id = btn.dataset.id;
+            const card = btn.closest('[data-id]');
+
+            btn.textContent = 'Removendo...';
+
+            try {
+              await deletarFavorito(id);
+              card.style.opacity = '0';
+              card.style.transition = 'opacity 0.3s';
+              setTimeout(() => {
+                card.remove();
+                // Se ficar vazio, mostra a mensagem de vazio.
+                if (lista.children.length === 0) {
+                  info.classList.add('hidden');
+                  vazio.classList.remove('hidden');
+                }
+              }, 300);
+            } catch (e) {
+              btn.textContent = 'Erro';
+              console.error(e);
+            }
+          });
+        });
+
+      } catch (erro) {
+        console.error(erro);
+        info.innerHTML = `<span class="text-nasa">ERRO · ${erro.message}</span>`;
+      }
+    }
+
+    carregar();
+  </script>
+
+</body>
+</html>

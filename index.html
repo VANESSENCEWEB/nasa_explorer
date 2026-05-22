@@ -5,25 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NASA Explorer</title>
 
-  <!-- fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
 
-  <!-- tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Parse SDK pro Back4app -->
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            nasa: '#fc3d21',
-            glow: '#06b6d4'
-          },
+          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
           fontFamily: {
             sans: ['Outfit', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace']
@@ -40,7 +33,6 @@
 
 <body class="font-sans text-slate-200 min-h-screen">
 
-  <!-- navbar -->
   <nav class="border-b border-white/10 py-4">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
       <a href="index.html" class="flex items-center gap-2.5 group">
@@ -58,60 +50,31 @@
         <a href="index.html" class="text-glow font-medium">Home</a>
         <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
         <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
-        <a href="#" class="text-slate-500 cursor-not-allowed">Favoritos</a>
+        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
       </div>
     </div>
   </nav>
 
-  <!-- hero com a foto do dia -->
   <main class="max-w-6xl mx-auto px-6 py-12">
 
-    <div class="text-[11px] text-glow tracking-[0.2em] mb-3" id="apod-date-label">FOTO ASTRONÔMICA DO DIA</div>
+    <div class="flex justify-between items-center mb-3">
+      <div class="text-[11px] text-glow tracking-[0.2em]" id="apod-date-label">FOTO ASTRONÔMICA DO DIA</div>
+      <button id="btn-favoritar" class="hidden text-[11px] bg-white/[0.04] border border-white/15 text-slate-300 rounded-full px-3 py-1.5 hover:bg-white/10 hover:border-white/30 transition">
+        <span id="btn-favoritar-texto">☆ Salvar</span>
+      </button>
+    </div>
 
-    <!-- container da imagem (vai ser preenchido pelo JS) -->
     <div id="apod-container" class="relative rounded-2xl overflow-hidden bg-black border border-white/10 mb-6" style="min-height: 400px;">
-      <!-- estado inicial: loading -->
       <div id="apod-loading" class="absolute inset-0 flex items-center justify-center">
         <div class="text-xs font-mono text-slate-500 tracking-[0.15em]">CARREGANDO...</div>
       </div>
     </div>
 
-    <!-- título e explicação -->
-    <h1 id="apod-title" class="text-3xl md:text-4xl font-light text-white tracking-tight mb-4">
-      &nbsp;
-    </h1>
-    <p id="apod-explanation" class="text-slate-400 leading-relaxed max-w-3xl mb-3">
-      &nbsp;
-    </p>
+    <h1 id="apod-title" class="text-3xl md:text-4xl font-light text-white tracking-tight mb-4">&nbsp;</h1>
+    <p id="apod-explanation" class="text-slate-400 leading-relaxed max-w-3xl mb-3">&nbsp;</p>
     <div id="apod-copyright" class="text-xs font-mono text-slate-600 tracking-wider"></div>
 
   </main>
-
-  <!-- páginas em breve -->
-  <section class="max-w-5xl mx-auto px-6 pb-24">
-    <h2 class="text-[11px] tracking-[0.2em] text-slate-500 mb-4 uppercase">Páginas planejadas</h2>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-
-      <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
-        <div class="text-[10px] text-glow mb-2 tracking-widest">EM BREVE</div>
-        <h3 class="text-white mb-1.5">NEO Watch</h3>
-        <p class="text-xs text-slate-500 leading-relaxed">Asteroides próximos da Terra, gráficos e visualização 3D.</p>
-      </div>
-
-      <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
-        <div class="text-[10px] text-glow mb-2 tracking-widest">EM BREVE</div>
-        <h3 class="text-white mb-1.5">Mars Gallery</h3>
-        <p class="text-xs text-slate-500 leading-relaxed">Galeria de fotos dos rovers Curiosity e Perseverance.</p>
-      </div>
-
-      <div class="bg-white/[0.03] border border-white/10 rounded-xl p-5">
-        <div class="text-[10px] text-glow mb-2 tracking-widest">EM BREVE</div>
-        <h3 class="text-white mb-1.5">Favoritos</h3>
-        <p class="text-xs text-slate-500 leading-relaxed">Coleção pessoal salva no Back4app (CRUD completo).</p>
-      </div>
-
-    </div>
-  </section>
 
   <footer class="border-t border-white/5 py-6 text-center">
     <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
@@ -119,37 +82,34 @@
     </div>
   </footer>
 
-  <!-- script da home -->
   <script type="module">
     import { fetchApod } from './js/nasa.js';
+    import { criarFavorito, estaSalvo, deletarFavorito } from './js/parse.js';
 
-    // Pega os elementos da página que vou preencher.
     const container = document.getElementById('apod-container');
     const loading = document.getElementById('apod-loading');
     const dateLabel = document.getElementById('apod-date-label');
     const titleEl = document.getElementById('apod-title');
     const explanationEl = document.getElementById('apod-explanation');
     const copyrightEl = document.getElementById('apod-copyright');
+    const btnFavoritar = document.getElementById('btn-favoritar');
+    const btnTexto = document.getElementById('btn-favoritar-texto');
 
-    // Carrega a foto do dia assim que a página abre.
+    let apodAtual = null;
+    let idFavoritoSalvo = null;
+
     async function carregarFotoDoDia() {
       try {
         const data = await fetchApod();
+        apodAtual = data;
 
-        // Formata a data pra ficar tipo "09 DE MAIO DE 2026".
         const data_formatada = new Date(data.date + 'T00:00:00').toLocaleDateString('pt-BR', {
-          day: '2-digit',
-          month: 'long',
-          year: 'numeric'
+          day: '2-digit', month: 'long', year: 'numeric'
         });
         dateLabel.textContent = `FOTO ASTRONÔMICA · ${data_formatada.toUpperCase()}`;
 
-        // Em alguns dias a NASA retorna vídeo do YouTube em vez de foto.
-        // Aí eu mostro o vídeo num iframe.
         if (data.media_type === 'video') {
-          container.innerHTML = `
-            <iframe src="${data.url}" class="w-full" style="height: 500px;" allowfullscreen></iframe>
-          `;
+          container.innerHTML = `<iframe src="${data.url}" class="w-full" style="height: 500px;" allowfullscreen></iframe>`;
         } else {
           container.innerHTML = `
             <img src="${data.hdurl || data.url}" alt="${data.title}" class="w-full block" />
@@ -159,17 +119,55 @@
 
         titleEl.textContent = data.title;
         explanationEl.textContent = data.explanation;
+        if (data.copyright) copyrightEl.textContent = `© ${data.copyright.trim()}`;
 
-        if (data.copyright) {
-          copyrightEl.textContent = `© ${data.copyright.trim()}`;
-        }
+        // Mostra botão de favoritar e checa se já tá salvo.
+        btnFavoritar.classList.remove('hidden');
+        idFavoritoSalvo = await estaSalvo(data.date);
+        atualizarBotao();
 
       } catch (erro) {
-        // Se der erro mostro uma mensagem na tela.
         console.error(erro);
         loading.innerHTML = `<div class="text-xs font-mono text-nasa tracking-wider">ERRO AO CARREGAR · ${erro.message}</div>`;
       }
     }
+
+    function atualizarBotao() {
+      if (idFavoritoSalvo) {
+        btnTexto.innerHTML = '★ Salvo';
+        btnFavoritar.classList.add('text-glow', 'border-glow/40');
+      } else {
+        btnTexto.innerHTML = '☆ Salvar';
+        btnFavoritar.classList.remove('text-glow', 'border-glow/40');
+      }
+    }
+
+    btnFavoritar.addEventListener('click', async () => {
+      if (!apodAtual) return;
+
+      btnFavoritar.disabled = true;
+
+      try {
+        if (idFavoritoSalvo) {
+          await deletarFavorito(idFavoritoSalvo);
+          idFavoritoSalvo = null;
+        } else {
+          const salvo = await criarFavorito({
+            tipo: 'apod',
+            nasaId: apodAtual.date,
+            titulo: apodAtual.title,
+            imageUrl: apodAtual.media_type === 'image' ? (apodAtual.hdurl || apodAtual.url) : ''
+          });
+          idFavoritoSalvo = salvo.id;
+        }
+        atualizarBotao();
+      } catch (e) {
+        console.error(e);
+        alert('Erro ao salvar favorito');
+      } finally {
+        btnFavoritar.disabled = false;
+      }
+    });
 
     carregarFotoDoDia();
   </script>

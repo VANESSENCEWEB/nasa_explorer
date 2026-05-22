@@ -5,26 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Image Library · NASA Explorer</title>
 
-  <!-- fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Parse SDK pro Back4app -->
-<script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
-
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            nasa: '#fc3d21',
-            glow: '#06b6d4'
-          },
+          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
           fontFamily: {
             sans: ['Outfit', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace']
@@ -41,7 +33,6 @@
 
 <body class="font-sans text-slate-200 min-h-screen">
 
-  <!-- navbar -->
   <nav class="border-b border-white/10 py-4">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
       <a href="index.html" class="flex items-center gap-2.5 group">
@@ -59,14 +50,13 @@
         <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
         <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
         <a href="mars.html" class="text-glow font-medium">Image Library</a>
-        <a href="#" class="text-slate-500 cursor-not-allowed">Favoritos</a>
+        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
       </div>
     </div>
   </nav>
 
   <main class="max-w-6xl mx-auto px-6 py-12">
 
-    <!-- cabeçalho da página -->
     <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NASA IMAGE LIBRARY</div>
     <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
       Galeria de imagens da NASA
@@ -77,7 +67,6 @@
       abaixo pra pesquisar o que quiser.
     </p>
 
-    <!-- barra de busca -->
     <form id="form-busca" class="flex gap-2 mb-3 max-w-2xl">
       <input
         type="text"
@@ -85,15 +74,11 @@
         placeholder="Buscar... ex: apollo 11, mars rover, jupiter, nebula"
         class="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-glow transition-colors"
       />
-      <button
-        type="submit"
-        class="bg-nasa text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition"
-      >
+      <button type="submit" class="bg-nasa text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition">
         Buscar
       </button>
     </form>
 
-    <!-- sugestões de busca rápida -->
     <div class="flex flex-wrap gap-2 mb-8">
       <span class="text-[10px] font-mono text-slate-500 tracking-widest uppercase mr-1 self-center">Populares:</span>
       <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="mars rover">mars rover</button>
@@ -104,14 +89,11 @@
       <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="iss">ISS</button>
     </div>
 
-    <!-- info -->
     <div id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6">
       CARREGANDO IMAGENS...
     </div>
 
-    <!-- grade de fotos -->
     <section id="galeria" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
-      <!-- preenchido pelo JS -->
     </section>
 
   </main>
@@ -124,6 +106,7 @@
 
   <script type="module">
     import { buscarImagensNasa } from './js/nasa.js';
+    import { criarFavorito, estaSalvo, deletarFavorito } from './js/parse.js';
 
     const form = document.getElementById('form-busca');
     const campo = document.getElementById('campo-busca');
@@ -131,7 +114,9 @@
     const galeria = document.getElementById('galeria');
     const sugestoes = document.querySelectorAll('.sugestao');
 
-    // Faz a busca e mostra os resultados na grade.
+    // Mapa de quais itens estão favoritados (nasaId → id do favorito).
+    const favoritados = new Map();
+
     async function buscar(termo) {
       info.textContent = `BUSCANDO POR "${termo}"...`;
       galeria.innerHTML = '';
@@ -144,25 +129,73 @@
           return;
         }
 
-        // Mostra no máximo 24 pra não pesar a página.
         const itensMostrados = itens.slice(0, 24);
         info.textContent = `${itensMostrados.length} DE ${itens.length} IMAGENS · BUSCA: "${termo}"`;
 
-        // Monta a grade.
-        galeria.innerHTML = itensMostrados.map(i => `
-          <div class="group relative bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden hover:border-white/30 transition-colors">
-            <img
-              src="${i.imagem}"
-              alt="${i.titulo}"
-              loading="lazy"
-              class="w-full aspect-square object-cover"
-            />
-            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-              <div class="text-[10px] font-mono text-glow tracking-widest mb-1">${i.data}</div>
-              <div class="text-xs text-white line-clamp-2">${i.titulo}</div>
+        // Checa quais já estão favoritados.
+        favoritados.clear();
+        await Promise.all(itensMostrados.map(async i => {
+          const id = await estaSalvo(i.id);
+          if (id) favoritados.set(i.id, id);
+        }));
+
+        galeria.innerHTML = itensMostrados.map(i => {
+          const salvo = favoritados.has(i.id);
+          return `
+            <div class="group relative bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden hover:border-white/30 transition-colors">
+              <img src="${i.imagem}" alt="${i.titulo}" loading="lazy" class="w-full aspect-square object-cover" />
+
+              <button
+                class="btn-fav absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center text-sm hover:bg-black/80 transition ${salvo ? 'text-glow' : 'text-white'}"
+                data-nasa-id="${i.id}"
+                data-titulo="${i.titulo.replace(/"/g, '&quot;')}"
+                data-imagem="${i.imagem}"
+                title="Favoritar"
+              >${salvo ? '★' : '☆'}</button>
+
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div class="text-[10px] font-mono text-glow tracking-widest mb-1">${i.data}</div>
+                <div class="text-xs text-white line-clamp-2">${i.titulo}</div>
+              </div>
             </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
+
+        // Adiciona eventos nos botões de favoritar.
+        document.querySelectorAll('.btn-fav').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const nasaId = btn.dataset.nasaId;
+            const titulo = btn.dataset.titulo;
+            const imagem = btn.dataset.imagem;
+
+            btn.disabled = true;
+
+            try {
+              if (favoritados.has(nasaId)) {
+                await deletarFavorito(favoritados.get(nasaId));
+                favoritados.delete(nasaId);
+                btn.textContent = '☆';
+                btn.classList.remove('text-glow');
+                btn.classList.add('text-white');
+              } else {
+                const salvo = await criarFavorito({
+                  tipo: 'image',
+                  nasaId,
+                  titulo,
+                  imageUrl: imagem
+                });
+                favoritados.set(nasaId, salvo.id);
+                btn.textContent = '★';
+                btn.classList.add('text-glow');
+                btn.classList.remove('text-white');
+              }
+            } catch (e) {
+              console.error(e);
+            } finally {
+              btn.disabled = false;
+            }
+          });
+        });
 
       } catch (erro) {
         console.error(erro);
@@ -170,16 +203,12 @@
       }
     }
 
-    // Quando o usuário envia o formulário (clica em Buscar ou aperta Enter).
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const termo = campo.value.trim();
-      if (termo) {
-        buscar(termo);
-      }
+      if (termo) buscar(termo);
     });
 
-    // Quando o usuário clica numa das sugestões rápidas.
     sugestoes.forEach(btn => {
       btn.addEventListener('click', () => {
         const termo = btn.dataset.termo;
@@ -188,7 +217,6 @@
       });
     });
 
-    // Busca inicial ao abrir a página.
     buscar('mars rover');
   </script>
 

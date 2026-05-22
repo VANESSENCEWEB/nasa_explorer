@@ -5,18 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NEO Watch · NASA Explorer</title>
 
-  <!-- fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js -->
+  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 
-  <!-- Importmap pro three.js -->
   <script type="importmap">
     {
       "imports": {
@@ -29,10 +25,7 @@
     tailwind.config = {
       theme: {
         extend: {
-          colors: {
-            nasa: '#fc3d21',
-            glow: '#06b6d4'
-          },
+          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
           fontFamily: {
             sans: ['Outfit', 'sans-serif'],
             mono: ['JetBrains Mono', 'monospace']
@@ -49,7 +42,6 @@
 
 <body class="font-sans text-slate-200 min-h-screen">
 
-  <!-- navbar -->
   <nav class="border-b border-white/10 py-4">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
       <a href="index.html" class="flex items-center gap-2.5 group">
@@ -67,14 +59,13 @@
         <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
         <a href="neo.html" class="text-glow font-medium">NEO Watch</a>
         <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
-        <a href="#" class="text-slate-500 cursor-not-allowed">Favoritos</a>
+        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
       </div>
     </div>
   </nav>
 
   <main class="max-w-6xl mx-auto px-6 py-12">
 
-    <!-- cabeçalho da página -->
     <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NEAR-EARTH OBJECT WATCH</div>
     <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
       Asteroides próximos da Terra
@@ -86,17 +77,14 @@
       seguidos pelos demais ordenados por distância.
     </p>
 
-    <!-- cena 3D da Terra -->
     <div class="relative rounded-2xl overflow-hidden bg-black border border-white/10 mb-10">
       <canvas id="earth-canvas" class="block w-full" style="height: 320px;"></canvas>
     </div>
 
-    <!-- mensagem de carregando / erro -->
     <div id="status" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-8">
       CARREGANDO ASTEROIDES...
     </div>
 
-    <!-- stats -->
     <section id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 hidden">
       <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
         <div class="text-[10px] text-slate-400 tracking-widest uppercase mb-2">Total</div>
@@ -116,28 +104,21 @@
       </div>
     </section>
 
-    <!-- gráficos -->
     <section id="graficos" class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6 hidden">
-
-      <!-- barras: ocupa 2/3 do espaço em telas grandes -->
       <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-5">
         <h3 class="text-sm font-medium text-white mb-4">Asteroides por dia</h3>
         <div style="height: 240px;">
           <canvas id="grafico-barras"></canvas>
         </div>
       </div>
-
-      <!-- doughnut: ocupa 1/3 -->
       <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
         <h3 class="text-sm font-medium text-white mb-4">Distribuição</h3>
         <div style="height: 240px;">
           <canvas id="grafico-doughnut"></canvas>
         </div>
       </div>
-
     </section>
 
-    <!-- tabela -->
     <section id="tabela-container" class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-12 hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-xs">
@@ -149,6 +130,7 @@
               <th class="text-left py-3 px-2 font-medium">Distância</th>
               <th class="text-left py-3 px-2 font-medium">Velocidade</th>
               <th class="text-left py-3 px-2 font-medium">Status</th>
+              <th class="text-right py-3 px-2 font-medium">★</th>
             </tr>
           </thead>
           <tbody id="tabela-corpo"></tbody>
@@ -167,49 +149,40 @@
   <script type="module">
     import { fetchNeoFeed } from './js/nasa.js';
     import { criarCenaDaTerra } from './js/earthScene.js';
+    import { criarFavorito, estaSalvo, deletarFavorito } from './js/parse.js';
 
-    // Elementos da página que vou preencher.
     const status = document.getElementById('status');
     const stats = document.getElementById('stats');
     const tabelaContainer = document.getElementById('tabela-container');
     const tabelaCorpo = document.getElementById('tabela-corpo');
 
-    // Calcula o intervalo de 7 dias (de hoje até 6 dias atrás).
-    // A NASA aceita no máximo 7 dias por requisição.
+    const favoritados = new Map(); // nasaId → id do favorito
+
     function getIntervaloPadrao() {
       const hoje = new Date();
       const inicio = new Date();
       inicio.setDate(hoje.getDate() - 6);
-
-      // Converte pra formato YYYY-MM-DD.
       return {
         inicio: inicio.toISOString().split('T')[0],
         fim: hoje.toISOString().split('T')[0]
       };
     }
 
-    // Formata a data pro padrão brasileiro (ex: "13 mai").
     function formatarData(isoDate) {
       return new Date(isoDate + 'T00:00:00').toLocaleDateString('pt-BR', {
-        day: '2-digit',
-        month: 'short'
+        day: '2-digit', month: 'short'
       });
     }
 
-    // Função principal que carrega tudo.
     async function carregar() {
-     
-
       try {
         const { inicio, fim } = getIntervaloPadrao();
         const asteroides = await fetchNeoFeed(inicio, fim);
 
-        // Esconde o "carregando" e mostra o conteúdo.
         status.classList.add('hidden');
         stats.classList.remove('hidden');
         tabelaContainer.classList.remove('hidden');
 
-        // Preenche os stats no topo.
         const perigosos = asteroides.filter(a => a.perigoso);
         document.getElementById('stat-total').textContent = asteroides.length;
         document.getElementById('stat-perigosos').textContent = perigosos.length;
@@ -220,80 +193,44 @@
         document.getElementById('stat-rapido').textContent =
           maisRapido.toFixed(1) + ' km/s';
 
-          // Cria a cena 3D da Terra com os asteroides reais.
         criarCenaDaTerra(document.getElementById('earth-canvas'), asteroides);
-
-        // Mostra a seção de gráficos.
         document.getElementById('graficos').classList.remove('hidden');
 
-        // Agrupa os asteroides por data pra montar o gráfico de barras.
-        // Quero saber quantos foram seguros e quantos foram perigosos em cada dia.
+        // Gráfico de barras
         const contagem_por_dia = {};
-
         for (const a of asteroides) {
-          if (!contagem_por_dia[a.data]) {
-            contagem_por_dia[a.data] = { seguros: 0, perigosos: 0 };
-          }
-          if (a.perigoso) {
-            contagem_por_dia[a.data].perigosos++;
-          } else {
-            contagem_por_dia[a.data].seguros++;
-          }
+          if (!contagem_por_dia[a.data]) contagem_por_dia[a.data] = { seguros: 0, perigosos: 0 };
+          if (a.perigoso) contagem_por_dia[a.data].perigosos++;
+          else contagem_por_dia[a.data].seguros++;
         }
 
-        // Pega as datas em ordem e separa os números em dois arrays
-        // (um pra cada tipo de barra empilhada).
         const datas_ordenadas = Object.keys(contagem_por_dia).sort();
         const labels = datas_ordenadas.map(formatarData);
         const dados_seguros = datas_ordenadas.map(d => contagem_por_dia[d].seguros);
         const dados_perigosos = datas_ordenadas.map(d => contagem_por_dia[d].perigosos);
 
-        // Cria o gráfico de barras.
         new Chart(document.getElementById('grafico-barras'), {
           type: 'bar',
           data: {
             labels: labels,
             datasets: [
-              {
-                label: 'Seguros',
-                data: dados_seguros,
-                backgroundColor: '#06b6d4',
-                borderRadius: 3
-              },
-              {
-                label: 'Perigosos',
-                data: dados_perigosos,
-                backgroundColor: '#fc3d21',
-                borderRadius: 3
-              }
+              { label: 'Seguros', data: dados_seguros, backgroundColor: '#06b6d4', borderRadius: 3 },
+              { label: 'Perigosos', data: dados_perigosos, backgroundColor: '#fc3d21', borderRadius: 3 }
             ]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 }
-              }
+              legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 } }
             },
             scales: {
-              x: {
-                stacked: true,
-                grid: { display: false },
-                ticks: { color: '#64748b', font: { size: 10 } }
-              },
-              y: {
-                stacked: true,
-                grid: { color: 'rgba(255,255,255,0.04)' },
-                ticks: { color: '#64748b', font: { size: 10 }, stepSize: 1 },
-                beginAtZero: true
-              }
+              x: { stacked: true, grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
+              y: { stacked: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { size: 10 }, stepSize: 1 }, beginAtZero: true }
             }
           }
         });
 
-        // Cria o gráfico doughnut com a proporção total.
         const total_seguros = asteroides.filter(a => !a.perigoso).length;
         const total_perigosos = asteroides.filter(a => a.perigoso).length;
 
@@ -309,29 +246,31 @@
             }]
           },
           options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '65%',
-            plugins: {
-              legend: {
-                position: 'bottom',
-                labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 }
-              }
-            }
+            responsive: true, maintainAspectRatio: false, cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 } } }
           }
         });
 
-        // Monta a tabela.
-        // Garanto que todos os perigosos apareçam, e completo o resto
-        // com os mais próximos até chegar em 20 linhas.
+        // Monta tabela com top 20 e checa favoritos.
         const perigososOrdenados = asteroides.filter(a => a.perigoso);
         const segurosOrdenados = asteroides.filter(a => !a.perigoso);
         const top20 = [...perigososOrdenados, ...segurosOrdenados].slice(0, 20);
+
+        // Checa favoritos em paralelo.
+        favoritados.clear();
+        await Promise.all(top20.map(async a => {
+          const id = await estaSalvo(a.id);
+          if (id) favoritados.set(a.id, id);
+        }));
 
         tabelaCorpo.innerHTML = top20.map(a => {
           const tag = a.perigoso
             ? '<span class="bg-red-500/15 text-red-300 px-2 py-0.5 rounded text-[10px] tracking-wider">PERIGOSO</span>'
             : '<span class="bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded text-[10px] tracking-wider">SEGURO</span>';
+
+          const salvo = favoritados.has(a.id);
+          const estrela = salvo ? '★' : '☆';
+          const corEstrela = salvo ? 'text-glow' : 'text-slate-600 hover:text-white';
 
           return `
             <tr class="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
@@ -341,9 +280,46 @@
               <td class="py-2.5 px-2 font-mono text-slate-300">${a.distancia_lunar.toFixed(2)} LD</td>
               <td class="py-2.5 px-2 font-mono text-slate-300">${a.velocidade.toFixed(1)} km/s</td>
               <td class="py-2.5 px-2">${tag}</td>
+              <td class="py-2.5 px-2 text-right">
+                <button class="btn-fav ${corEstrela} text-base transition" data-nasa-id="${a.id}" data-nome="${a.nome}" data-perigoso="${a.perigoso}">${estrela}</button>
+              </td>
             </tr>
           `;
         }).join('');
+
+        // Eventos de favoritar.
+        document.querySelectorAll('.btn-fav').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const nasaId = btn.dataset.nasaId;
+            const nome = btn.dataset.nome;
+            const perigoso = btn.dataset.perigoso === 'true';
+
+            btn.disabled = true;
+
+            try {
+              if (favoritados.has(nasaId)) {
+                await deletarFavorito(favoritados.get(nasaId));
+                favoritados.delete(nasaId);
+                btn.textContent = '☆';
+                btn.className = 'btn-fav text-base transition text-slate-600 hover:text-white';
+              } else {
+                const salvo = await criarFavorito({
+                  tipo: 'neo',
+                  nasaId,
+                  titulo: `Asteroide ${nome}${perigoso ? ' (perigoso)' : ''}`,
+                  imageUrl: ''
+                });
+                favoritados.set(nasaId, salvo.id);
+                btn.textContent = '★';
+                btn.className = 'btn-fav text-base transition text-glow';
+              }
+            } catch (e) {
+              console.error(e);
+            } finally {
+              btn.disabled = false;
+            }
+          });
+        });
 
       } catch (erro) {
         console.error(erro);
