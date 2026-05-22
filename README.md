@@ -7,7 +7,7 @@ UNICAP · 2º período de Sistemas para Internet · Professor: Gabriel Fernandes
 ## Deploy
 
 ```bash
-🌐 Acesse: https://www.nasa-explor.netlify.app
+🌐 Acesse: [nasa-explorer-beige.vercel.app](https://nasa-explorer-beige.vercel.app)
 ```
 
 
