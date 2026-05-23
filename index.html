@@ -76,6 +76,47 @@
 
   </main>
 
+  <!-- cards de navegação pras outras páginas -->
+  <section class="max-w-6xl mx-auto px-6 pb-24">
+    <h2 class="text-[11px] tracking-[0.2em] text-slate-500 mb-5 uppercase">Explore</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+      <a href="neo.html" class="group bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:border-glow/30 hover:bg-white/[0.05] transition">
+        <div class="text-2xl mb-3">☄️</div>
+        <h3 class="text-white text-base font-medium mb-1.5">NEO Watch</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Monitora asteroides próximos da Terra com Terra 3D, gráficos e tabela.
+        </p>
+        <div class="text-[11px] font-mono text-glow tracking-widest">
+          ABRIR →
+        </div>
+      </a>
+
+      <a href="mars.html" class="group bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:border-glow/30 hover:bg-white/[0.05] transition">
+        <div class="text-2xl mb-3">🔭</div>
+        <h3 class="text-white text-base font-medium mb-1.5">Image Library</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Mais de 150 mil imagens do acervo da NASA. Busque por planetas, missões, galáxias.
+        </p>
+        <div class="text-[11px] font-mono text-glow tracking-widest">
+          ABRIR →
+        </div>
+      </a>
+
+      <a href="favoritos.html" class="group bg-white/[0.03] border border-white/10 rounded-xl p-5 hover:border-glow/30 hover:bg-white/[0.05] transition">
+        <div class="text-2xl mb-3">★</div>
+        <h3 class="text-white text-base font-medium mb-1.5">Favoritos</h3>
+        <p class="text-xs text-slate-400 leading-relaxed mb-3">
+          Sua coleção pessoal salva no Back4app, com nota e edição.
+        </p>
+        <div class="text-[11px] font-mono text-glow tracking-widest">
+          ABRIR →
+        </div>
+      </a>
+
+    </div>
+  </section>
+
   <footer class="border-t border-white/5 py-6 text-center">
     <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
       NASA EXPLORER · 2026
@@ -121,14 +162,26 @@
         explanationEl.textContent = data.explanation;
         if (data.copyright) copyrightEl.textContent = `© ${data.copyright.trim()}`;
 
-        // Mostra botão de favoritar e checa se já tá salvo.
         btnFavoritar.classList.remove('hidden');
         idFavoritoSalvo = await estaSalvo(data.date);
         atualizarBotao();
 
       } catch (erro) {
         console.error(erro);
-        loading.innerHTML = `<div class="text-xs font-mono text-nasa tracking-wider">ERRO AO CARREGAR · ${erro.message}</div>`;
+        // Mensagem amigável dependendo do tipo de erro.
+        let mensagem = 'Não consegui carregar a foto agora.';
+        if (erro.message.includes('429')) {
+          mensagem = 'Muitas requisições à NASA. Tente daqui a pouco.';
+        } else if (erro.message.includes('Failed to fetch')) {
+          mensagem = 'Sem conexão com a internet?';
+        }
+        loading.innerHTML = `
+          <div class="text-center px-6">
+            <div class="text-3xl mb-3 opacity-30">🛰️</div>
+            <div class="text-xs font-mono text-nasa tracking-wider mb-2">${mensagem}</div>
+            <div class="text-[10px] text-slate-600">${erro.message}</div>
+          </div>
+        `;
       }
     }
 
@@ -144,7 +197,6 @@
 
     btnFavoritar.addEventListener('click', async () => {
       if (!apodAtual) return;
-
       btnFavoritar.disabled = true;
 
       try {
