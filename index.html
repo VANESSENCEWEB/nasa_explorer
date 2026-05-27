@@ -410,10 +410,17 @@
         dateLabel.textContent = `FOTO · ${data_formatada.toUpperCase()}`;
 
         if (data.media_type === 'video') {
-          container.innerHTML = `<iframe src="${data.url}" class="w-full h-full" allowfullscreen></iframe>`;
-        } else {
-          container.innerHTML = `<img src="${data.hdurl || data.url}" alt="${data.title}" class="w-full h-full object-cover" />`;
-        }
+  // A NASA às vezes manda vídeo do YouTube, às vezes mp4 direto.
+  if (data.url.endsWith('.mp4')) {
+    container.innerHTML = `
+      <video src="${data.url}" class="w-full h-full object-cover" autoplay muted loop playsinline controls></video>
+    `;
+  } else {
+    container.innerHTML = `<iframe src="${data.url}" class="w-full h-full" allowfullscreen></iframe>`;
+  }
+} else {
+  container.innerHTML = `<img src="${data.hdurl || data.url}" alt="${data.title}" class="w-full h-full object-cover" />`;
+}
 
         titleEl.textContent = data.title;
         explanationEl.textContent = data.explanation;
