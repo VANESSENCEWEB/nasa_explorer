@@ -1,3 +1,10 @@
+/* Garante que o conteúdo da página fique acima do vídeo de fundo.
+   Sem isso, em alguns navegadores o vídeo sobe pra cima do texto. */
+body > *:not(.bg-video):not(.bg-overlay):not(.spotlight) {
+  position: relative;
+  z-index: 1;
+}
+
 /* Vídeo de fundo da galáxia em todas as páginas. */
 .bg-video {
   position: fixed;
@@ -6,7 +13,8 @@
   width: 100vw;
   height: 100vh;
   object-fit: cover;
-  z-index: -2;
+  z-index: 0;
+  pointer-events: none;
 }
 
 /* Overlay escuro por cima do vídeo pra texto ficar legível. */
@@ -22,19 +30,17 @@
     rgba(10, 14, 39, 0.75) 50%,
     rgba(10, 14, 39, 0.88) 100%
   );
-  z-index: -1;
+  z-index: 0;
   pointer-events: none;
 }
 
 /* SPOTLIGHT CURSOR
-   Cria um círculo de luz que segue o mouse, simulando uma lanterna
-   iluminando partes da tela. As variáveis --x e --y são atualizadas
-   via JavaScript conforme o mouse se move. */
+   Luz que segue o mouse, simulando uma lanterna. */
 .spotlight {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
   background: radial-gradient(
     600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
     rgba(6, 182, 212, 0.08),
@@ -43,8 +49,7 @@
   transition: background 0.3s ease;
 }
 
-/* Glow na borda dos cards quando o mouse passa por perto.
-   Mesma técnica: gradient radial que segue o mouse. */
+/* Glow na borda dos cards no hover. */
 .card-glow {
   position: relative;
   overflow: hidden;
@@ -69,8 +74,7 @@
   opacity: 1;
 }
 
-/* Em dispositivos com prefer-reduced-motion ativado, esconde o vídeo
-   e o spotlight pra acessibilidade. */
+/* Acessibilidade: usuários com reduced-motion não veem o vídeo. */
 @media (prefers-reduced-motion: reduce) {
   .bg-video,
   .spotlight {
@@ -78,9 +82,10 @@
   }
 }
 
-/* No mobile (touch), spotlight desativado porque não tem cursor. */
+/* Mobile (touch) não tem cursor, então spotlight desativado. */
 @media (hover: none) {
   .spotlight {
     display: none;
   }
 }
+
