@@ -9,6 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
+  <!-- CSS global com video de fundo -->
+<link rel="stylesheet" href="./css/global.css" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
 
@@ -32,6 +35,16 @@
 </head>
 
 <body class="font-sans text-slate-200 min-h-screen">
+
+  <!-- Vídeo de fundo (galáxia) com overlay escuro -->
+  <video class="bg-video" autoplay muted loop playsinline preload="auto">
+    <source src="./assets/galaxy.mp4" type="video/mp4" />
+  </video>
+  <div class="bg-overlay"></div>
+
+  <!-- Spotlight cursor (segue o mouse iluminando) -->
+<div class="spotlight" id="spotlight"></div>
+
 
   <nav class="border-b border-white/10 py-4">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
@@ -219,6 +232,24 @@
 
     buscar('mars rover');
   </script>
+<script>
+  // Faz o spotlight (luz do mouse) seguir o cursor pela página.
+  const spotlight = document.getElementById('spotlight');
+  if (spotlight) {
+    document.addEventListener('mousemove', (e) => {
+      spotlight.style.setProperty('--mouse-x', e.clientX + 'px');
+      spotlight.style.setProperty('--mouse-y', e.clientY + 'px');
+    });
+  }
 
+  // Glow nos cards: gradient segue o mouse dentro do card.
+  document.querySelectorAll('.card-glow').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty('--card-x', (e.clientX - rect.left) + 'px');
+      card.style.setProperty('--card-y', (e.clientY - rect.top) + 'px');
+    });
+  });
+</script>
 </body>
 </html>
