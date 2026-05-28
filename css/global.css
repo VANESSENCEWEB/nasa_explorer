@@ -1,29 +1,32 @@
-/* Garante que o conteúdo da página fique acima do vídeo de fundo.
-   Sem isso, em alguns navegadores o vídeo sobe pra cima do texto. */
+/* Impede scroll horizontal. */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Conteúdo da página fica acima do vídeo de fundo. */
 body > *:not(.bg-video):not(.bg-overlay):not(.spotlight) {
   position: relative;
   z-index: 1;
 }
 
-/* Vídeo de fundo da galáxia em todas as páginas. */
 .bg-video {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
   z-index: 0;
   pointer-events: none;
 }
 
-/* Overlay escuro por cima do vídeo pra texto ficar legível. */
 .bg-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(
     180deg,
     rgba(10, 14, 39, 0.85) 0%,
@@ -34,8 +37,6 @@ body > *:not(.bg-video):not(.bg-overlay):not(.spotlight) {
   pointer-events: none;
 }
 
-/* SPOTLIGHT CURSOR
-   Luz que segue o mouse, simulando uma lanterna. */
 .spotlight {
   position: fixed;
   inset: 0;
@@ -49,7 +50,6 @@ body > *:not(.bg-video):not(.bg-overlay):not(.spotlight) {
   transition: background 0.3s ease;
 }
 
-/* Glow na borda dos cards no hover. */
 .card-glow {
   position: relative;
   overflow: hidden;
@@ -74,7 +74,6 @@ body > *:not(.bg-video):not(.bg-overlay):not(.spotlight) {
   opacity: 1;
 }
 
-/* Acessibilidade: usuários com reduced-motion não veem o vídeo. */
 @media (prefers-reduced-motion: reduce) {
   .bg-video,
   .spotlight {
@@ -82,10 +81,8 @@ body > *:not(.bg-video):not(.bg-overlay):not(.spotlight) {
   }
 }
 
-/* Mobile (touch) não tem cursor, então spotlight desativado. */
 @media (hover: none) {
   .spotlight {
     display: none;
   }
 }
-
