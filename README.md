@@ -21,7 +21,7 @@ Projeto da disciplina de **Programação para Web** do curso de **Sistemas para 
 
 Painel que conecta o usuário a múltiplas fontes da NASA em tempo real, com visualizações 3D, gráficos interativos e uma coleção pessoal de favoritos persistida em backend.
 
-**Atividade A07 · Entrega 25/05/2026 · Prof. Gabriel Fernandes**
+**Atividade A07 · Entrega 28/05/2026 · Prof. Gabriel Fernandes**
 
 ---
 

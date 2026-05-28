@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NASA Explorer</title>
-  
-<!-- Favicons -->
+
+  <!-- Favicons -->
   <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
   <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
   <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
-  <!-- Descrição da página (SEO) -->
+  <!-- SEO -->
   <meta name="description" content="Painel que conecta você ao acervo da NASA — fotos astronômicas, asteroides próximos da Terra em 3D e sua coleção pessoal de favoritos." />
 
-  <!-- Open Graph (preview ao compartilhar no WhatsApp, LinkedIn, etc) -->
+  <!-- Open Graph -->
   <meta property="og:title" content="NASA Explorer" />
   <meta property="og:description" content="Explore o cosmos em tempo real com dados públicos da NASA." />
   <meta property="og:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
@@ -23,12 +23,11 @@
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NASA Explorer" />
 
-  <!-- Twitter / X -->
+  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="NASA Explorer" />
   <meta name="twitter:description" content="Explore o cosmos em tempo real com a NASA." />
   <meta name="twitter:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
-
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -123,7 +122,7 @@
       transform: translateY(-6px) rotate(-45deg);
     }
 
-    /* HERO HUD CORNERS */
+    /* HERO HUD */
     .hud-corner {
       position: absolute;
       width: 48px; height: 48px;
@@ -144,7 +143,6 @@
     .hud-br { bottom: 0; right: 0; transform: scale(-1,-1); }
     @keyframes hud-appear { to { opacity: 0.3; } }
 
-    /* COORDS */
     .hero-coord {
       position: absolute;
       font-family: 'JetBrains Mono', monospace;
@@ -159,7 +157,6 @@
     .hero-coord-br { bottom: 0.6rem; right: 0.75rem; }
     @keyframes deco-fade { to { opacity: 0.65; } }
 
-    /* VERTICAL LABEL */
     .hero-label-v {
       position: absolute;
       right: 0;
@@ -177,7 +174,6 @@
       animation: deco-fade 1s ease 1.5s forwards;
     }
 
-    /* SCROLL HINT */
     .scroll-hint-line {
       width: 1px;
       height: 36px;
@@ -198,7 +194,6 @@
       transform: rotate(180deg);
     }
 
-    /* TYPEWRITER CURSOR */
     .hero-tw-cursor {
       display: inline-block;
       width: 2px;
@@ -209,7 +204,6 @@
       animation: blink 0.8s step-end infinite;
     }
 
-    /* COSMOS GLITCH */
     .cosmos-glitch {
       -webkit-text-fill-color: #ffffff;
       background: none;
@@ -245,7 +239,7 @@
       }
     }
 
-    /* === TÍTULOS DE SEÇÃO DESTACADOS === */
+    /* TÍTULOS DE SEÇÃO */
     .section-title {
       font-family: 'Outfit', sans-serif;
       font-size: clamp(1.75rem, 3.5vw, 2.5rem);
@@ -280,7 +274,7 @@
       margin-bottom: 2rem;
     }
 
-    /* === CARDS MAIS ESCUROS — glow do hover destaca mais === */
+    /* CARDS ESCUROS */
     .card-dark {
       background: rgba(2, 6, 23, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -302,13 +296,13 @@
 
 <body class="font-sans text-slate-200 min-h-screen">
 
-  <!-- Vídeo de fundo (galáxia) -->
+  <!-- Vídeo de fundo -->
   <video class="bg-video" autoplay muted loop playsinline preload="auto">
     <source src="./assets/galaxy.mp4" type="video/mp4" />
   </video>
   <div class="bg-overlay"></div>
 
-  <!-- Spotlight cursor -->
+  <!-- Spotlight -->
   <div class="spotlight" id="spotlight"></div>
 
   <nav class="border-b border-white/10 py-4 relative">
@@ -339,7 +333,6 @@
     </div>
   </nav>
 
-  <!-- Mobile Menu -->
   <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
     <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
       <a href="index.html" class="text-glow font-medium text-sm tracking-wide">Home</a>
@@ -349,8 +342,8 @@
     </div>
   </div>
 
-  <!-- HERO -->
-  <section class="relative max-w-7xl mx-auto px-6 py-20 md:py-32" id="hero-section">
+  <!-- HERO CENTRALIZADO + GRANDE -->
+  <section class="relative max-w-7xl mx-auto px-6 py-24 md:py-40" id="hero-section">
 
     <div class="hud-corner hud-tl"></div>
     <div class="hud-corner hud-tr"></div>
@@ -362,45 +355,50 @@
 
     <div class="hero-label-v">NASA Explorer — Real-Time Data · 2026</div>
 
-    <div class="font-mono text-[10px] tracking-[0.2em] text-glow mb-6 fade-up flex items-center gap-3">
-      <span class="w-1.5 h-1.5 rounded-full bg-glow animate-pulse"></span>
-      <span>SYSTEM ONLINE · CONNECTED TO api.nasa.gov</span>
-    </div>
+    <!-- Conteúdo centralizado -->
+    <div class="flex flex-col items-center text-center max-w-5xl mx-auto">
 
-    <h1 class="title-glow text-5xl md:text-6xl lg:text-7xl font-light tracking-tight leading-[1] mb-6 fade-up" style="animation-delay: 0.1s;">
-      Explore o<br/>
-      <span class="font-medium cosmos-glitch">cosmos</span> em<br/>
-      tempo real.
-    </h1>
+      <div class="font-mono text-[10px] tracking-[0.2em] text-glow mb-6 fade-up flex items-center gap-3">
+        <span class="w-1.5 h-1.5 rounded-full bg-glow animate-pulse"></span>
+        <span>SYSTEM ONLINE · CONNECTED TO api.nasa.gov</span>
+      </div>
 
-    <div class="font-mono text-[11px] text-slate-500 mb-8 fade-up" style="animation-delay: 0.25s; min-height: 1.4rem;">
-      <span id="hero-tw-text"></span><span class="hero-tw-cursor"></span>
-    </div>
+      <h1 class="title-glow text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light tracking-tight leading-[0.95] mb-8 fade-up" style="animation-delay: 0.1s;">
+        Explore o<br/>
+        <span class="font-medium cosmos-glitch">cosmos</span> em<br/>
+        tempo real.
+      </h1>
 
-    <div class="font-mono text-xs text-slate-500 mb-8 fade-up cursor-blink" style="animation-delay: 0.4s;">
-      <span class="text-glow">$</span> initialize_explorer --mode=cosmos
-    </div>
+      <div class="font-mono text-xs md:text-sm text-slate-500 mb-8 fade-up" style="animation-delay: 0.25s; min-height: 1.4rem;">
+        <span id="hero-tw-text"></span><span class="hero-tw-cursor"></span>
+      </div>
 
-    <div class="flex flex-wrap gap-3 fade-up" style="animation-delay: 0.55s;">
-      <a href="neo.html" class="bg-nasa text-white rounded-lg px-6 py-3 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition flex items-center gap-2">
-        <span>Começar a explorar</span>
-        <span>→</span>
-      </a>
-      <a href="#sobre" class="bg-white/[0.05] border border-white/15 text-slate-200 rounded-lg px-6 py-3 text-sm font-medium hover:bg-white/10 transition">
-        Sobre o projeto
-      </a>
-    </div>
+      <div class="font-mono text-xs md:text-sm text-slate-500 mb-10 fade-up cursor-blink" style="animation-delay: 0.4s;">
+        <span class="text-glow">$</span> initialize_explorer --mode=cosmos
+      </div>
 
-    <div class="flex flex-col items-center gap-2 mt-16 fade-up" style="animation-delay: 0.8s;">
-      <div class="scroll-hint-line"></div>
-      <span class="scroll-hint-text">scroll</span>
+      <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay: 0.55s;">
+        <a href="neo.html" class="bg-nasa text-white rounded-lg px-7 py-3.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition flex items-center gap-2">
+          <span>Começar a explorar</span>
+          <span>→</span>
+        </a>
+        <a href="#sobre" class="bg-white/[0.05] border border-white/15 text-slate-200 rounded-lg px-7 py-3.5 text-sm font-medium hover:bg-white/10 transition">
+          Sobre o projeto
+        </a>
+      </div>
+
+      <div class="flex flex-col items-center gap-2 mt-20 fade-up" style="animation-delay: 0.8s;">
+        <div class="scroll-hint-line"></div>
+        <span class="scroll-hint-text">scroll</span>
+      </div>
+
     </div>
 
     <div class="scan-line"></div>
   </section>
 
-  <!-- === SOBRE O PROJETO === -->
-  <section id="sobre" class="max-w-7xl mx-auto px-6 pb-20">
+  <!-- SOBRE O PROJETO (com mais espaçamento do topo) -->
+  <section id="sobre" class="max-w-7xl mx-auto px-6 pt-24 pb-20">
     <div class="section-eyebrow">sobre o projeto</div>
     <h2 class="section-title">O que é o NASA Explorer?</h2>
     <p class="section-description">
@@ -430,7 +428,7 @@
     </div>
   </section>
 
-  <!-- === LIVE DATA === -->
+  <!-- LIVE DATA -->
   <section id="stats" class="max-w-7xl mx-auto px-6 pb-20">
     <div class="section-eyebrow">live data</div>
     <h2 class="section-title">Estatísticas em tempo real</h2>
@@ -460,7 +458,7 @@
     </div>
   </section>
 
-  <!-- === NAVEGUE === -->
+  <!-- NAVEGUE -->
   <section class="max-w-7xl mx-auto px-6 pb-20">
     <div class="section-eyebrow">navegue</div>
     <h2 class="section-title">Explore o projeto</h2>
@@ -491,7 +489,7 @@
     </div>
   </section>
 
-  <!-- === DESTAQUE DO DIA === -->
+  <!-- DESTAQUE DO DIA -->
   <section class="max-w-7xl mx-auto px-6 pb-20">
     <div class="section-eyebrow">destaque do dia</div>
     <h2 class="section-title">Foto astronômica</h2>
@@ -507,9 +505,17 @@
       <div>
         <div class="flex justify-between items-start mb-3">
           <div class="text-[11px] text-glow tracking-[0.2em] font-mono" id="apod-date-label">FOTO ASTRONÔMICA DO DIA</div>
-          <button id="btn-favoritar" class="hidden text-[11px] bg-white/[0.04] border border-white/15 text-slate-300 rounded-full px-3 py-1.5 hover:bg-white/10 transition shrink-0">
-            <span id="btn-favoritar-texto">☆ Salvar</span>
-          </button>
+    <button id="btn-favoritar" class="hidden text-[13px] font-mono tracking-widest 
+    bg-white/[0.05] border border-white/20 text-slate-300 
+    rounded-full px-4 py-1.5 
+    hover:bg-[#0B4D9C] hover:border-[#00A1F4] hover:text-white 
+    hover:shadow-[0_0_20px_#00A1F4] hover:shadow-blue-500/50
+    active:scale-95 active:bg-[#083D7E]
+    transition-all duration-300 ease-out shrink-0 flex items-center gap-1.5">
+  
+  <span id="btn-favoritar-icone" class="text-lg leading-none">⭐</span>
+  <span id="btn-favoritar-texto">Salvar</span>
+</button>
         </div>
         <h2 id="apod-title" class="text-2xl font-light text-white tracking-tight mb-4">&nbsp;</h2>
         <p id="apod-explanation" class="text-slate-400 text-sm leading-relaxed mb-3 line-clamp-6">&nbsp;</p>
@@ -551,9 +557,7 @@
 
         if (data.media_type === 'video') {
           if (data.url.endsWith('.mp4')) {
-            container.innerHTML = `
-              <video src="${data.url}" class="w-full h-full object-cover" autoplay muted loop playsinline controls></video>
-            `;
+            container.innerHTML = `<video src="${data.url}" class="w-full h-full object-cover" autoplay muted loop playsinline controls></video>`;
           } else {
             container.innerHTML = `<iframe src="${data.url}" class="w-full h-full" allowfullscreen></iframe>`;
           }
@@ -625,7 +629,6 @@
   </script>
 
   <script>
-    // Spotlight cursor
     const spotlight = document.getElementById('spotlight');
     if (spotlight) {
       document.addEventListener('mousemove', (e) => {
@@ -634,7 +637,6 @@
       });
     }
 
-    // Hamburger menu toggle
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const mobileMenu   = document.getElementById('mobile-menu');
     if (hamburgerBtn && mobileMenu) {
@@ -652,7 +654,6 @@
       });
     }
 
-    // Glow nos cards
     document.querySelectorAll('.card-glow').forEach(card => {
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
@@ -661,7 +662,6 @@
       });
     });
 
-    // Typewriter no subtítulo da hero
     const twEl = document.getElementById('hero-tw-text');
     if (twEl) {
       const phrases = [
