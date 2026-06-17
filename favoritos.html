@@ -61,13 +61,9 @@
 <body class="font-sans text-slate-200 min-h-screen">
 
   <!-- Vídeo de fundo (galáxia) com overlay escuro -->
-  <video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-    <source src="./assets/galaxy.mp4" type="video/mp4" />
-
-
-
-
-  </video>
+<video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+  <source src="./assets/galaxy.mp4" type="video/mp4" />
+</video>
   <div class="bg-overlay"></div>
 
 <!-- Spotlight cursor (segue o mouse iluminando) -->
@@ -142,6 +138,27 @@
     const lista = document.getElementById('lista');
     const vazio = document.getElementById('vazio');
 
+    /**
+ * Retorna o rótulo de exibição correspondente ao tipo do favorito.
+ * Extraído da função `carregar` para evitar ternário aninhado (regra S3358).
+ */
+function obterTipoLabel(tipo) {
+  const labels = {
+    apod: 'FOTO ASTRONÔMICA',
+    neo: 'ASTEROIDE',
+    image: 'IMAGEM'
+  };
+  return labels[tipo] || tipo.toUpperCase();
+}
+
+/**
+ * Retorna o emoji decorativo correspondente ao tipo do favorito.
+ * Usado quando o favorito não possui imagem associada.
+ */
+function obterIconeTipo(tipo) {
+  return tipo === 'neo' ? '☄️' : '✨';
+}
+
     async function carregar() {
       try {
         const favoritos = await listarFavoritos();
@@ -156,16 +173,14 @@
 
         lista.innerHTML = favoritos.map(f => {
           const dataFormatada = new Date(f.createdAt).toLocaleDateString('pt-BR');
-          const tipoLabel = {
-            apod: 'FOTO ASTRONÔMICA',
-            neo: 'ASTEROIDE',
-            image: 'IMAGEM'
-          }[f.tipo] || f.tipo.toUpperCase();
+          // Uso dentro do map:
+const tipoLabel = obterTipoLabel(f.tipo);
+const iconeTipo = obterIconeTipo(f.tipo);
 
           const imagemHtml = f.imageUrl
             ? `<img src="${f.imageUrl}" alt="${f.titulo}" class="w-full aspect-video object-cover" loading="lazy" />`
             : `<div class="w-full aspect-video bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center">
-                 <div class="text-3xl">${f.tipo === 'neo' ? '☄️' : '✨'}</div>
+                 <div class="text-3xl">${iconeTipo}</div>
                </div>`;
 
           return `
