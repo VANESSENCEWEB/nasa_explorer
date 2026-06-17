@@ -297,7 +297,7 @@
 <body class="font-sans text-slate-200 min-h-screen">
 
   <!-- Vídeo de fundo -->
-  <video class="bg-video" autoplay muted loop playsinline preload="auto">
+  <video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
     <source src="./assets/galaxy.mp4" type="video/mp4" />
   </video>
   <div class="bg-overlay"></div>
@@ -494,7 +494,7 @@
     <div class="section-eyebrow">destaque do dia</div>
     <h2 class="section-title">Foto astronômica</h2>
     <p class="section-description">
-      Atualizada todos os dias pela NASA. Pode ser uma foto ou um vídeo — meu código identifica e renderiza apropriadamente.
+      Atualizada todos os dias pela NASA. Pode ser uma foto ou um vídeo
     </p>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
       <div id="apod-container" class="relative rounded-xl overflow-hidden bg-black border border-white/10 aspect-video">
