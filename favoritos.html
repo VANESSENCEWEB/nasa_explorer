@@ -227,9 +227,9 @@ const iconeTipo = obterIconeTipo(f.tipo);
                 btn.textContent = 'Salvar nota';
                 btn.disabled = false;
               }, 1500);
-            } catch (e) {
+            } catch (error_) {
               btn.textContent = 'Erro';
-              console.error(e);
+              console.error(error_);
             }
           });
         });
@@ -256,16 +256,16 @@ const iconeTipo = obterIconeTipo(f.tipo);
                   vazio.classList.remove('hidden');
                 }
               }, 300);
-            } catch (e) {
+            } catch (error_) {
               btn.textContent = 'Erro';
-              console.error(e);
+              console.error(error_);
             }
           });
         });
 
-      } catch (erro) {
-        console.error(erro);
-        info.innerHTML = `<span class="text-nasa">ERRO · ${erro.message}</span>`;
+      } catch (error_) {
+        console.error(error_);
+        info.innerHTML = `<span class="text-nasa">ERRO · ${error_.message}</span>`;
       }
     }
 
