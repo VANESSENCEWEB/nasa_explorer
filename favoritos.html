@@ -55,6 +55,37 @@
 
   <style>
     body { background: #0a0e27; }
+
+    /* === MOBILE MENU (hamburger) === */
+    .mobile-menu {
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+                  opacity 0.3s ease;
+      opacity: 0;
+    }
+    .mobile-menu.is-open {
+      max-height: 320px;
+      opacity: 1;
+    }
+    .ham-line {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.25s ease;
+    }
+    #hamburger-btn.is-open .ham-line:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+    #hamburger-btn.is-open .ham-line:nth-child(2) {
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    #hamburger-btn.is-open .ham-line:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
   </style>
 </head>
 
@@ -71,7 +102,7 @@
   
 
   <!-- navbar -->
-  <nav class="border-b border-white/10 py-4">
+  <nav class="border-b border-white/10 py-4 relative">
     <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
       <a href="index.html" class="flex items-center gap-2.5 group">
         <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
@@ -84,14 +115,33 @@
         </svg>
         <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
       </a>
-      <div class="flex gap-7 text-xs">
+
+      <!-- Links desktop -->
+      <div class="hidden md:flex gap-7 text-xs">
         <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
         <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
         <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
         <a href="favoritos.html" class="text-glow font-medium">Favoritos</a>
       </div>
+
+      <!-- Hamburger (mobile) -->
+      <button id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false">
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+        <span class="ham-line"></span>
+      </button>
     </div>
   </nav>
+
+  <!-- Mobile Menu -->
+  <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
+      <a href="index.html" class="text-slate-400 hover:text-white transition-colors text-sm">Home</a>
+      <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
+      <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
+      <a href="favoritos.html" class="text-glow font-medium text-sm tracking-wide">Favoritos</a>
+    </div>
+  </div>
 
   <main class="max-w-6xl mx-auto px-6 py-12">
 
@@ -279,6 +329,24 @@ const iconeTipo = obterIconeTipo(f.tipo);
     document.addEventListener('mousemove', (e) => {
       spotlight.style.setProperty('--mouse-x', e.clientX + 'px');
       spotlight.style.setProperty('--mouse-y', e.clientY + 'px');
+    });
+  }
+
+  // Hamburger menu toggle
+  const hamburgerBtn = document.getElementById('hamburger-btn');
+  const mobileMenu   = document.getElementById('mobile-menu');
+  if (hamburgerBtn && mobileMenu) {
+    hamburgerBtn.addEventListener('click', () => {
+      const isOpen = mobileMenu.classList.toggle('is-open');
+      hamburgerBtn.classList.toggle('is-open', isOpen);
+      hamburgerBtn.setAttribute('aria-expanded', isOpen);
+    });
+    mobileMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.remove('is-open');
+        hamburgerBtn.classList.remove('is-open');
+        hamburgerBtn.setAttribute('aria-expanded', 'false');
+      });
     });
   }
 
