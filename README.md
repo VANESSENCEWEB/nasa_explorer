@@ -2,7 +2,6 @@
 
 ![NASA Explorer Animation](nasa-explorer-3s-small.gif)
 
-<img src="./assets/favicon/favicon.svg" width="96" alt="NASA Explorer logo" />
 
 # 🚀 NASA Explorer
 
