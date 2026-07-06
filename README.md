@@ -1,5 +1,7 @@
 <div align="center">
 
+![NASA Explorer Animation](nasa-explorer.gif)
+
 <img src="./assets/favicon/favicon.svg" width="96" alt="NASA Explorer logo" />
 
 # 🚀 NASA Explorer
