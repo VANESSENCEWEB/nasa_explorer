@@ -1,9 +1,10 @@
 // Cliente da API da NASA.
-// Aqui ficam todas as funções que conversam com a NASA.
+// Em produção as rotas autenticadas passam por /api/nasa (chave só no servidor).
+// No servidor estático local, o proxy não existe e usamos a DEMO_KEY pública da NASA.
 
-const API_KEY = '70IcSHfoJNS203UhQt7rOczSFwOskdpDyUhoiZ1P';
-const BASE_URL = 'https://api.nasa.gov';
+const NASA_HOST = 'https://api.nasa.gov';
 const FETCH_TIMEOUT_MS = 15000;
+const NEO_CACHE_MS = 10 * 60 * 1000;
 
 async function fetchJson(url, mensagemErro) {
   const response = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
@@ -15,47 +16,54 @@ async function fetchJson(url, mensagemErro) {
   return response.json();
 }
 
-// Busca a foto astronômica do dia.
-// A API retorna um objeto com: title, url, hdurl, explanation, date, media_type, copyright.
-// O media_type pode ser "image" ou "video" (em alguns dias é vídeo do YouTube).
-export async function fetchApod() {
-  return fetchJson(
-    `${BASE_URL}/planetary/apod?api_key=${API_KEY}`,
-    'Erro ao buscar foto da NASA'
-  );
+async function fetchNasa(tipo, params, mensagemErro) {
+  const query = new URLSearchParams({ tipo, ...params });
+  const proxyUrl = `/api/nasa?${query.toString()}`;
+
+  try {
+    const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+    if (response.ok) return response.json();
+    if (response.status !== 404) {
+      throw new Error(`${mensagemErro}: ${response.status}`);
+    }
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith(`${mensagemErro}:`)) {
+      throw error;
+    }
+  }
+
+  const direto = new URL(tipo === 'apod' ? '/planetary/apod' : '/neo/rest/v1/feed', NASA_HOST);
+  direto.searchParams.set('api_key', 'DEMO_KEY');
+  for (const [chave, valor] of Object.entries(params)) {
+    if (valor) direto.searchParams.set(chave, valor);
+  }
+
+  return fetchJson(direto.toString(), mensagemErro);
 }
 
-// Busca asteroides próximos da Terra num intervalo de datas.
-// Importante: a NASA só aceita no máximo 7 dias de diferença entre as datas.
-// As datas devem estar no formato YYYY-MM-DD (ex: "2026-05-13").
-export async function fetchNeoFeed(dataInicio, dataFim) {
-  const data = await fetchJson(
-    `${BASE_URL}/neo/rest/v1/feed?start_date=${dataInicio}&end_date=${dataFim}&api_key=${API_KEY}`,
-    'Erro ao buscar asteroides'
-  );
+function isoOffset(dias) {
+  const data = new Date();
+  data.setDate(data.getDate() + dias);
+  return data.toISOString().slice(0, 10);
+}
 
-  // A API retorna os asteroides agrupados por dia, num objeto tipo:
-  // { "2026-05-13": [...], "2026-05-14": [...] }
-  // Eu prefiro uma lista única com só os campos que vou usar,
-  // então transformo aqui antes de retornar.
+export function normalizarAsteroides(data) {
   const lista = [];
+  const agrupados = data?.near_earth_objects || {};
 
-  for (const data_do_dia in data.near_earth_objects) {
-    const asteroides_do_dia = data.near_earth_objects[data_do_dia];
-
-    for (const asteroide of asteroides_do_dia) {
-      const aproximacao = asteroide.close_approach_data[0];
+  for (const dataDoDia in agrupados) {
+    for (const asteroide of agrupados[dataDoDia]) {
+      const aproximacao = asteroide.close_approach_data?.[0];
       if (!aproximacao) continue;
 
-      const diametro_min = asteroide.estimated_diameter.meters.estimated_diameter_min;
-      const diametro_max = asteroide.estimated_diameter.meters.estimated_diameter_max;
-      const diametro_medio = Math.round((diametro_min + diametro_max) / 2);
+      const diametroMin = asteroide.estimated_diameter.meters.estimated_diameter_min;
+      const diametroMax = asteroide.estimated_diameter.meters.estimated_diameter_max;
 
       lista.push({
         id: asteroide.id,
-        nome: asteroide.name.replace(/[()]/g, '').trim(),
-        data: data_do_dia,
-        diametro: diametro_medio,
+        nome: String(asteroide.name || '').replace(/[()]/g, '').trim(),
+        data: dataDoDia,
+        diametro: Math.round((diametroMin + diametroMax) / 2),
         velocidade: parseFloat(aproximacao.relative_velocity.kilometers_per_second),
         distancia_lunar: parseFloat(aproximacao.miss_distance.lunar),
         perigoso: asteroide.is_potentially_hazardous_asteroid
@@ -67,15 +75,8 @@ export async function fetchNeoFeed(dataInicio, dataFim) {
   return lista;
 }
 
-// Busca imagens da NASA Image Library com base num termo de busca.
-// Essa API não precisa de chave de API e tem mais de 150 mil imagens.
-export async function buscarImagensNasa(termo) {
-  const data = await fetchJson(
-    `https://images-api.nasa.gov/search?q=${encodeURIComponent(termo)}&media_type=image`,
-    'Erro ao buscar imagens'
-  );
-
-  const itens = (data.collection?.items ?? []).map((item) => {
+export function normalizarImagens(data) {
+  const itens = (data?.collection?.items ?? []).map((item) => {
     const info = item.data?.[0];
     const link = item.links?.[0];
     if (!info) return null;
@@ -90,4 +91,56 @@ export async function buscarImagensNasa(termo) {
   }).filter(Boolean);
 
   return itens.filter((item) => item.imagem !== '');
+}
+
+export async function fetchApod() {
+  let ultimoErro = new Error('Erro ao buscar foto da NASA');
+
+  for (let diasAtras = 0; diasAtras <= 2; diasAtras++) {
+    try {
+      const params = diasAtras === 0 ? {} : { date: isoOffset(-diasAtras) };
+      return await fetchNasa('apod', params, 'Erro ao buscar foto da NASA');
+    } catch (error) {
+      ultimoErro = error;
+    }
+  }
+
+  throw ultimoErro;
+}
+
+export async function fetchNeoFeed(dataInicio, dataFim) {
+  const cacheKey = `neo:${dataInicio}:${dataFim}`;
+
+  try {
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      const { at, lista } = JSON.parse(cached);
+      if (Date.now() - at < NEO_CACHE_MS && Array.isArray(lista)) return lista;
+    }
+  } catch {
+    // sessionStorage pode estar indisponível (Safari privado / testes).
+  }
+
+  const data = await fetchNasa(
+    'neo',
+    { start_date: dataInicio, end_date: dataFim },
+    'Erro ao buscar asteroides'
+  );
+  const lista = normalizarAsteroides(data);
+
+  try {
+    sessionStorage.setItem(cacheKey, JSON.stringify({ at: Date.now(), lista }));
+  } catch {
+    // ignore quota / private mode
+  }
+
+  return lista;
+}
+
+export async function buscarImagensNasa(termo) {
+  const data = await fetchJson(
+    `https://images-api.nasa.gov/search?q=${encodeURIComponent(termo)}&media_type=image`,
+    'Erro ao buscar imagens'
+  );
+  return normalizarImagens(data);
 }

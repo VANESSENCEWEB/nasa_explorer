@@ -16,7 +16,7 @@ export function escapeHtml(valor) {
 export function isSafeHttpUrl(url) {
   if (!url) return false;
   try {
-    const parsed = new URL(url, window.location.href);
+    const parsed = new URL(url, 'https://nasa-explorer.local');
     return parsed.protocol === 'https:' || parsed.protocol === 'http:';
   } catch {
     return false;
