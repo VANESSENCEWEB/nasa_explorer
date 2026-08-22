@@ -1,7 +1,5 @@
 <div align="center">
 
-![NASA Explorer Animation](nasa-explorer-3s-small.gif)
-
 
 # 🚀 NASA Explorer
 
