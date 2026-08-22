@@ -1,21 +1,24 @@
 {
-  "name": "MyWebSite",
-  "short_name": "MySite",
+  "name": "NASA Explorer",
+  "short_name": "NASA Explorer",
+  "description": "Dashboard interativo com dados públicos da NASA: foto do dia, asteroides em 3D e acervo de imagens.",
+  "start_url": "/",
+  "lang": "pt-BR",
   "icons": [
     {
-      "src": "/web-app-manifest-192x192.png",
+      "src": "./web-app-manifest-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable"
+      "purpose": "any"
     },
     {
-      "src": "/web-app-manifest-512x512.png",
+      "src": "./web-app-manifest-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
   ],
-  "theme_color": "#ffffff",
-  "background_color": "#ffffff",
+  "theme_color": "#0a0e27",
+  "background_color": "#0a0e27",
   "display": "standalone"
 }

@@ -53,24 +53,24 @@ Em uma única aplicação, o usuário pode:
 <table>
   <tr>
     <td align="center" width="50%">
-      <img src="./screenshot-home.png" alt="Home do NASA Explorer mostrando o hero mission control com titulo Explore o cosmos em tempo real e a foto astronomica do dia" loading="lazy" />
+      <img src="./screenshot-home.jpg" alt="Home do NASA Explorer mostrando o hero mission control com titulo Explore o cosmos em tempo real e a foto astronomica do dia" loading="lazy" />
       <br />
       <sub><b>🏠 Home</b> · Hero mission control + APOD do dia</sub>
     </td>
     <td align="center" width="50%">
-      <img src="./screenshot-nasa-explorer.png" alt="Pagina NEO Watch mostrando a Terra 3D em wireframe rodeada por asteroides orbitando e graficos Chart.js" loading="lazy" />
+      <img src="./screenshot-nasa-explorer.jpg" alt="Pagina NEO Watch mostrando a Terra 3D em wireframe rodeada por asteroides orbitando e graficos Chart.js" loading="lazy" />
       <br />
       <sub><b>☄️ NEO Watch</b> · Terra 3D em Three.js + Chart.js</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="50%">
-      <img src="./screenshot-library.png" alt="Pagina Image Library com galeria de imagens da NASA em grid responsivo" loading="lazy" />
+      <img src="./screenshot-library.jpg" alt="Pagina Image Library com galeria de imagens da NASA em grid responsivo" loading="lazy" />
       <br />
       <sub><b>🔭 Image Library</b> · Busca no acervo com 150K+ imagens</sub>
     </td>
     <td align="center" width="50%">
-      <img src="./screenshot-favoritos.png" alt="Pagina Favoritos mostrando cards da colecao pessoal salvos no Back4app com botoes de editar nota e remover" loading="lazy" />
+      <img src="./screenshot-favoritos.jpg" alt="Pagina Favoritos mostrando cards da colecao pessoal salvos no Back4app com botoes de editar nota e remover" loading="lazy" />
       <br />
       <sub><b>⭐ Favoritos</b> · CRUD completo persistido no Back4app</sub>
     </td>
@@ -155,8 +155,11 @@ Dois gráficos com **Chart.js** que resumem os asteroides dos últimos 7 dias: *
 - **Título com efeito glitch** aleatório na palavra "cosmos"
 - **Typewriter** rotacionando 4 frases sobre o projeto
 
-### 📱 Responsividade completa
-Menu hamburger animado no mobile, layout adaptativo em todas as páginas, imagens otimizadas com `loading="lazy"`.
+### 🔍 Lightbox e feedback
+Clique numa imagem da galeria, da foto do dia ou dos favoritos para ampliá-la. Ações de CRUD agora confirmam com toasts em vez de falhar em silêncio.
+
+### 📱 Responsividade e acessibilidade
+Menu hamburger animado no mobile, skip link, `aria-current` na navegação, labels em formulários, `prefers-reduced-motion` (pausa vídeo, 3D e typewriter) e foco visível em teclado.
 
 ## 💡 Decisões técnicas
 
@@ -228,14 +231,28 @@ Cada commit resolve **uma única issue**, seguindo Conventional Commits. O hist�
 
 </details>
 
+### Polimento de apresentação
+
+Além do SonarQube, a base foi reorganizada para portfolio:
+
+- JS duplicado (menu, spotlight, Tailwind config) extraído para módulos compartilhados
+- HTML das páginas sem scripts inline longos
+- Escape de HTML em dados das APIs (XSS)
+- SRI no Parse SDK e no Chart.js
+- Headers de segurança e cache no `vercel.json`
+- Screenshots do README comprimidos (~8 MB de PNG → ~560 KB de JPEG)
+- Manifest PWA com nome, cores e caminhos de ícone corretos
+- Página 404, `robots.txt` e `sitemap.xml`
+
 ## 🎓 O que este projeto demonstra
 
 - ✅ **Fundamentos sólidos** — HTML semântico, CSS moderno, JavaScript ES6+ sem framework
 - ✅ **Consumo de APIs REST** — 3 APIs públicas + 1 backend próprio, com tratamento de erros
 - ✅ **CRUD completo** — Create, Read, Update, Delete persistidos em backend
 - ✅ **Visualizações complexas** — Three.js (3D) e Chart.js (dados)
-- ✅ **UX cuidada** — efeitos visuais, responsividade, animações não-intrusivas
-- ✅ **Qualidade de código** — SonarQube passando, SRI, acessibilidade
+- ✅ **UX cuidada** — efeitos visuais, lightbox, toasts, responsividade, animações não-intrusivas
+- ✅ **Qualidade de código** — SonarQube, SRI, sanitização XSS, módulos ES, acessibilidade
+- ✅ **SEO e compartilhamento** — canonical, Open Graph, JSON-LD, sitemap, robots.txt
 - ✅ **Metodologia profissional** — git com histórico limpo, um commit por feature
 - ✅ **Documentação** — README completo, decisões técnicas explicadas, versionada
 
@@ -266,20 +283,25 @@ php -S localhost:5500              # PHP
 ```
 nasa_explorer/
 ├── assets/
-│   ├── favicon/           # Ícones para todos os dispositivos (iOS, Android, desktop)
+│   ├── favicon/           # Ícones + web manifest
 │   ├── galaxy.mp4         # Vídeo de fundo (930KB, otimizado)
 │   └── og-image.png       # Preview para redes sociais
 ├── css/
-│   └── global.css         # Estilos compartilhados (video, spotlight, cards)
+│   └── global.css         # Estilos compartilhados (layout, a11y, lightbox)
 ├── js/
-│   ├── nasa.js            # Cliente das APIs da NASA (APOD, NEO, Image Library)
-│   ├── parse.js           # Cliente do Back4app (CRUD de favoritos)
-│   └── earthScene.js      # Cena 3D da Terra com Three.js
+│   ├── ui.js              # Menu, spotlight, toasts, lightbox
+│   ├── dom.js             # Helpers de sanitização e a11y
+│   ├── nasa.js            # Cliente das APIs da NASA
+│   ├── parse.js           # Cliente do Back4app (CRUD)
+│   ├── earthScene.js      # Cena 3D da Terra com Three.js
+│   └── pages/             # Lógica de cada página (home, neo, library, favoritos)
 ├── index.html             # Home + APOD
 ├── neo.html               # Asteroides + Terra 3D + Charts
 ├── mars.html              # Image Library com busca
 ├── favoritos.html         # Coleção pessoal (CRUD completo)
-├── LICENSE                # Licença MIT
+├── 404.html               # Página de erro
+├── robots.txt · sitemap.xml · vercel.json
+├── LICENSE
 └── README.md
 ```
 
