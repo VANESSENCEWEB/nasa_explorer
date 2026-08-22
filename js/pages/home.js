@@ -102,6 +102,7 @@ export function iniciarHome() {
       btnFavoritar.classList.remove('hidden');
       idFavoritoSalvo = await estaSalvo(data.date);
       atualizarBotao();
+      return;
     } catch (erro) {
       console.error(erro);
       if (loading) {

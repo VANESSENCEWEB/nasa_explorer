@@ -97,7 +97,7 @@ function rotuloUsuario(user) {
 
 function htmlAuth(user, compacto) {
   if (!user) {
-    return `<a href="favoritos.html" class="${compacto ? 'text-slate-400 hover:text-white transition-colors text-sm' : 'text-slate-300 hover:text-white transition-colors'}">Entrar</a>`;
+    return `<a href="favoritos.html" class="${compacto ? 'text-glow text-sm' : 'text-[11px] font-mono tracking-widest uppercase text-glow border border-glow/30 rounded px-2.5 py-1 hover:bg-glow/10 transition'}">Entrar</a>`;
   }
 
   const nome = rotuloUsuario(user);
