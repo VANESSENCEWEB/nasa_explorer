@@ -81,11 +81,12 @@
           </svg>
           <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
         </a>
-        <div class="hidden md:flex gap-7 text-xs">
+        <div class="hidden md:flex gap-7 text-xs items-center">
           <a href="index.html" class="text-glow font-medium" aria-current="page">Home</a>
           <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
           <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
           <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
+          <div id="auth-nav"></div>
         </div>
         <button type="button" id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
           <span class="ham-line"></span>
@@ -100,6 +101,7 @@
         <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
         <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
         <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
+        <div id="auth-nav-mobile" class="pt-2 border-t border-white/10"></div>
       </div>
     </div>
   </header>
@@ -173,7 +175,7 @@
         </div>
         <div class="card-dark rounded-xl p-4">
           <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">CRUD Completo</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">Criação, leitura, atualização e remoção de favoritos persistidos no Back4app.</p>
+          <p class="text-xs text-slate-300 leading-relaxed">Criação, leitura, atualização e remoção de favoritos privados por conta no Back4app.</p>
         </div>
         <div class="card-dark rounded-xl p-4">
           <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Acadêmico</h3>
@@ -202,7 +204,7 @@
         <div class="card-dark rounded-xl p-5">
           <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Favoritos salvos</div>
           <div class="text-3xl font-mono font-medium text-white" id="stat-favs">—</div>
-          <div class="text-[10px] text-slate-500 mt-1">backend Back4app</div>
+          <div class="text-[10px] text-slate-500 mt-1">na sua conta</div>
         </div>
       </div>
     </section>

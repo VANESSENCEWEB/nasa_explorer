@@ -1,11 +1,21 @@
 // Cliente do Back4app via Parse SDK.
-// Aqui faço o CRUD completo da classe Favorite.
+// CRUD da classe Favorite + autenticação com Parse Users.
+
+import { mensagemErroAuth } from './authMessages.js';
 
 const APP_ID = 'TaNXXG1REQ03jg9PgO8Q3NC82UOLOkEBugKliCkl';
 const JS_KEY = 'IwZTRZzl0VJuN6Z2EIv2xaeuBkUKHTjgoXagH1Zp';
 const SERVER_URL = 'https://parseapi.back4app.com/';
 
 let Favorite = null;
+
+export class AuthNecessariaError extends Error {
+  constructor() {
+    super('Entre na sua conta para usar os favoritos.');
+    this.name = 'AuthNecessariaError';
+    this.code = 'AUTH_REQUIRED';
+  }
+}
 
 function getParse() {
   const ParseSDK = window.Parse;
@@ -39,21 +49,72 @@ function paraFavoritoSimples(objeto) {
   };
 }
 
+export function usuarioAtual() {
+  try {
+    return getParse().User.current() || null;
+  } catch {
+    return null;
+  }
+}
+
+function exigirUsuario() {
+  const user = usuarioAtual();
+  if (!user) throw new AuthNecessariaError();
+  return user;
+}
+
+export async function cadastrar(email, senha) {
+  const ParseSDK = getParse();
+  const user = new ParseSDK.User();
+  const emailLimpo = String(email || '').trim().toLowerCase();
+  user.set('username', emailLimpo);
+  user.set('email', emailLimpo);
+  user.set('password', senha);
+
+  try {
+    await user.signUp();
+    return user;
+  } catch (error) {
+    throw new Error(mensagemErroAuth(error));
+  }
+}
+
+export async function entrar(email, senha) {
+  const ParseSDK = getParse();
+  try {
+    return await ParseSDK.User.logIn(String(email || '').trim().toLowerCase(), senha);
+  } catch (error) {
+    throw new Error(mensagemErroAuth(error));
+  }
+}
+
+export async function sair() {
+  const ParseSDK = getParse();
+  await ParseSDK.User.logOut();
+}
+
 export async function criarFavorito(dados) {
-  getParse();
+  const ParseSDK = getParse();
+  const user = exigirUsuario();
   const fav = new Favorite();
   fav.set('tipo', dados.tipo);
   fav.set('nasaId', dados.nasaId);
   fav.set('titulo', dados.titulo);
   fav.set('imageUrl', dados.imageUrl || '');
   fav.set('userNote', dados.userNote || '');
+  fav.set('user', user);
+  fav.setACL(new ParseSDK.ACL(user));
 
   const salvo = await fav.save();
   return paraFavoritoSimples(salvo);
 }
 
 export async function listarFavoritos() {
+  const user = usuarioAtual();
+  if (!user) return [];
+
   const query = criarQuery();
+  query.equalTo('user', user);
   query.descending('createdAt');
   query.limit(100);
 
@@ -62,6 +123,7 @@ export async function listarFavoritos() {
 }
 
 export async function atualizarNota(id, novaNota) {
+  exigirUsuario();
   const query = criarQuery();
   const fav = await query.get(id);
   fav.set('userNote', novaNota);
@@ -71,6 +133,7 @@ export async function atualizarNota(id, novaNota) {
 }
 
 export async function deletarFavorito(id) {
+  exigirUsuario();
   const query = criarQuery();
   const fav = await query.get(id);
   await fav.destroy();
@@ -78,7 +141,11 @@ export async function deletarFavorito(id) {
 }
 
 export async function estaSalvo(nasaId) {
+  const user = usuarioAtual();
+  if (!user) return null;
+
   const query = criarQuery();
+  query.equalTo('user', user);
   query.equalTo('nasaId', nasaId);
 
   const encontrado = await query.first();
