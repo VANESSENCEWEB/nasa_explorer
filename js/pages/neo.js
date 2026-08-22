@@ -2,7 +2,7 @@ import { fetchNeoFeed } from '../nasa.js';
 import { criarCenaDaTerra } from '../earthScene.js';
 import { criarFavorito, estaSalvo, deletarFavorito } from '../parse.js';
 import { $, escapeHtml } from '../dom.js';
-import { mostrarToast } from '../ui.js';
+import { mostrarToast, lidarErroFavorito } from '../ui.js';
 
 export function iniciarNeo() {
   const status = $('status');
@@ -194,7 +194,9 @@ export function iniciarNeo() {
             }
           } catch (erro) {
             console.error(erro);
-            mostrarToast('Não foi possível atualizar o favorito.', 'erro');
+            if (!lidarErroFavorito(erro)) {
+              mostrarToast('Não foi possível atualizar o favorito.', 'erro');
+            }
           } finally {
             btn.disabled = false;
           }

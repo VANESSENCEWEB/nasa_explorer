@@ -1,12 +1,14 @@
 // Interface compartilhada: menu, spotlight, vídeo de fundo, toasts e lightbox.
 
-import { prefersReducedMotion } from './dom.js';
+import { escapeHtml, prefersReducedMotion } from './dom.js';
+import { AuthNecessariaError, sair, usuarioAtual } from './parse.js';
 
 export function iniciarInterface() {
   iniciarVideoDeFundo();
   iniciarSpotlight();
   iniciarMenuMobile();
   iniciarCardGlow();
+  iniciarAuthNav();
 }
 
 function iniciarVideoDeFundo() {
@@ -86,6 +88,57 @@ function iniciarCardGlow() {
       card.style.setProperty('--card-y', `${evento.clientY - rect.top}px`);
     });
   });
+}
+
+function rotuloUsuario(user) {
+  const email = user.get('email') || user.get('username') || 'conta';
+  return String(email).split('@')[0];
+}
+
+function htmlAuth(user, compacto) {
+  if (!user) {
+    return `<a href="favoritos.html" class="${compacto ? 'text-slate-400 hover:text-white transition-colors text-sm' : 'text-slate-300 hover:text-white transition-colors'}">Entrar</a>`;
+  }
+
+  const nome = rotuloUsuario(user);
+  return `
+    <div class="flex items-center gap-3 ${compacto ? '' : ''}">
+      <span class="text-slate-400 ${compacto ? 'text-sm' : ''} truncate max-w-[9rem]" title="${escapeHtml(nome)}">${escapeHtml(nome)}</span>
+      <button type="button" class="btn-sair text-[10px] font-mono tracking-widest uppercase text-slate-500 hover:text-white border border-white/10 rounded px-2 py-1">Sair</button>
+    </div>
+  `;
+}
+
+function iniciarAuthNav() {
+  const desktop = document.getElementById('auth-nav');
+  const mobile = document.getElementById('auth-nav-mobile');
+  if (!desktop && !mobile) return;
+
+  const user = usuarioAtual();
+  if (desktop) desktop.innerHTML = htmlAuth(user, false);
+  if (mobile) mobile.innerHTML = htmlAuth(user, true);
+
+  document.querySelectorAll('.btn-sair').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      try {
+        await sair();
+        window.location.reload();
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  });
+}
+
+export function lidarErroFavorito(erro) {
+  if (erro instanceof AuthNecessariaError) {
+    mostrarToast(erro.message, 'erro');
+    window.setTimeout(() => {
+      window.location.href = 'favoritos.html';
+    }, 700);
+    return true;
+  }
+  return false;
 }
 
 export function mostrarToast(mensagem, tipo = 'info') {

@@ -1,7 +1,7 @@
 import { buscarImagensNasa } from '../nasa.js';
 import { criarFavorito, estaSalvo, deletarFavorito } from '../parse.js';
 import { $, escapeHtml, isSafeHttpUrl } from '../dom.js';
-import { mostrarToast, abrirLightbox } from '../ui.js';
+import { mostrarToast, abrirLightbox, lidarErroFavorito } from '../ui.js';
 
 export function iniciarLibrary() {
   const form = $('form-busca');
@@ -106,7 +106,9 @@ export function iniciarLibrary() {
             }
           } catch (erro) {
             console.error(erro);
-            mostrarToast('Não foi possível atualizar o favorito.', 'erro');
+            if (!lidarErroFavorito(erro)) {
+              mostrarToast('Não foi possível atualizar o favorito.', 'erro');
+            }
           } finally {
             btn.disabled = false;
           }

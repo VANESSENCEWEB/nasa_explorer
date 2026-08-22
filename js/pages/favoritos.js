@@ -1,4 +1,5 @@
-import { listarFavoritos, atualizarNota, deletarFavorito } from '../parse.js';
+import { cadastrar, entrar, listarFavoritos, atualizarNota, deletarFavorito, usuarioAtual } from '../parse.js';
+import { emailValido } from '../authMessages.js';
 import { $, escapeHtml, isSafeHttpUrl } from '../dom.js';
 import { mostrarToast, abrirLightbox } from '../ui.js';
 
@@ -19,9 +20,98 @@ export function iniciarFavoritos() {
   const info = $('info');
   const lista = $('lista');
   const vazio = $('vazio');
-  if (!info || !lista || !vazio) return;
+  const painelAuth = $('painel-auth');
+  const painelColecao = $('painel-colecao');
+  if (!info || !lista || !vazio || !painelAuth || !painelColecao) return;
+
+  const formAuth = $('form-auth');
+  const tabEntrar = $('tab-entrar');
+  const tabCadastrar = $('tab-cadastrar');
+  const campoEmail = $('auth-email');
+  const campoSenha = $('auth-senha');
+  const wrapConfirma = $('auth-confirma-wrap');
+  const campoConfirma = $('auth-confirma');
+  const authErro = $('auth-erro');
+  const btnAuth = $('btn-auth');
+
+  let modoCadastro = false;
+
+  function mostrarErroAuth(texto) {
+    authErro.textContent = texto;
+    authErro.classList.remove('hidden');
+  }
+
+  function limparErroAuth() {
+    authErro.textContent = '';
+    authErro.classList.add('hidden');
+  }
+
+  function atualizarAbas() {
+    tabEntrar.classList.toggle('is-active', !modoCadastro);
+    tabCadastrar.classList.toggle('is-active', modoCadastro);
+    tabEntrar.setAttribute('aria-selected', String(!modoCadastro));
+    tabCadastrar.setAttribute('aria-selected', String(modoCadastro));
+    wrapConfirma.classList.toggle('hidden', !modoCadastro);
+    campoConfirma.required = modoCadastro;
+    btnAuth.textContent = modoCadastro ? 'Criar conta' : 'Entrar';
+    campoSenha.autocomplete = modoCadastro ? 'new-password' : 'current-password';
+    limparErroAuth();
+  }
+
+  tabEntrar.addEventListener('click', () => {
+    modoCadastro = false;
+    atualizarAbas();
+  });
+
+  tabCadastrar.addEventListener('click', () => {
+    modoCadastro = true;
+    atualizarAbas();
+  });
+
+  formAuth.addEventListener('submit', async (evento) => {
+    evento.preventDefault();
+    limparErroAuth();
+
+    const email = campoEmail.value.trim();
+    const senha = campoSenha.value;
+
+    if (!emailValido(email)) {
+      mostrarErroAuth('Informe um e-mail válido.');
+      return;
+    }
+    if (senha.length < 6) {
+      mostrarErroAuth('A senha precisa ter pelo menos 6 caracteres.');
+      return;
+    }
+    if (modoCadastro && senha !== campoConfirma.value) {
+      mostrarErroAuth('As senhas não coincidem.');
+      return;
+    }
+
+    btnAuth.disabled = true;
+    try {
+      if (modoCadastro) await cadastrar(email, senha);
+      else await entrar(email, senha);
+      window.location.reload();
+    } catch (error) {
+      mostrarErroAuth(error.message);
+    } finally {
+      btnAuth.disabled = false;
+    }
+  });
 
   async function carregar() {
+    const user = usuarioAtual();
+
+    if (!user) {
+      painelAuth.classList.remove('hidden');
+      painelColecao.classList.add('hidden');
+      return;
+    }
+
+    painelAuth.classList.add('hidden');
+    painelColecao.classList.remove('hidden');
+
     try {
       const favoritos = await listarFavoritos();
 
@@ -34,7 +124,7 @@ export function iniciarFavoritos() {
 
       info.classList.remove('hidden');
       vazio.classList.add('hidden');
-      info.textContent = `${favoritos.length} ${favoritos.length === 1 ? 'FAVORITO' : 'FAVORITOS'} SALVOS NO BACK4APP`;
+      info.textContent = `${favoritos.length} ${favoritos.length === 1 ? 'FAVORITO' : 'FAVORITOS'} NA SUA CONTA`;
 
       lista.innerHTML = favoritos.map((fav) => {
         const dataFormatada = escapeHtml(new Date(fav.createdAt).toLocaleDateString('pt-BR'));
@@ -135,7 +225,7 @@ export function iniciarFavoritos() {
                   info.classList.add('hidden');
                   vazio.classList.remove('hidden');
                 } else {
-                  info.textContent = `${lista.children.length} ${lista.children.length === 1 ? 'FAVORITO' : 'FAVORITOS'} SALVOS NO BACK4APP`;
+                  info.textContent = `${lista.children.length} ${lista.children.length === 1 ? 'FAVORITO' : 'FAVORITOS'} NA SUA CONTA`;
                 }
               }, 300);
             }
@@ -153,5 +243,6 @@ export function iniciarFavoritos() {
     }
   }
 
+  atualizarAbas();
   carregar();
 }

@@ -156,7 +156,8 @@ Dois gráficos com **Chart.js** que resumem os asteroides dos últimos 7 dias: *
 - **Título com efeito glitch** aleatório na palavra "cosmos"
 - **Typewriter** rotacionando 4 frases sobre o projeto
 
-### 🔍 Lightbox e feedback
+### 🔐 Conta e favoritos privados
+Cadastro e login com **Parse Users** (e-mail + senha). Cada favorito novo é gravado com ACL só do dono — a coleção deixa de ser um balde compartilhado.
 Clique numa imagem da galeria, da foto do dia ou dos favoritos para ampliá-la. Ações de CRUD agora confirmam com toasts em vez de falhar em silêncio.
 
 ### 📱 Responsividade e acessibilidade
@@ -190,9 +191,9 @@ A chave da NASA API é só **rate-limiting**, mas no client ela aparece no DevTo
 </details>
 
 <details>
-<summary><b>4. Sem autenticação de usuário (favoritos compartilhados)</b></summary>
+<summary><b>4. Favoritos privados com Parse Users</b></summary>
 
-O requisito principal era **CRUD completo em API REST**. Adicionar auth ampliaria demais o escopo. Documentei essa decisão claramente. **Em produção**, usaria o sistema Users nativo do Parse.
+O CRUD acadêmico começou com uma coleção compartilhada. Agora cada pessoa cria conta (e-mail + senha) no **Parse Users**. Os favoritos novos levam `user` + ACL só do dono: outra conta não lê, não edita e não apaga. No Back4app, em *Favorite → Security*, o ideal é restringir Find/Get/Create/Update/Delete a usuários autenticados (não Public).
 
 </details>
 
@@ -246,12 +247,14 @@ Além do SonarQube, a base foi reorganizada para portfolio:
 - Página 404, `robots.txt` e `sitemap.xml`
 - Tailwind compilado (sem CDN de desenvolvimento)
 - Proxy serverless da NASA API + testes Vitest no CI
+- Autenticação Parse Users com favoritos privados (ACL por dono)
 
 ## 🎓 O que este projeto demonstra
 
 - ✅ **Fundamentos sólidos** — HTML semântico, CSS moderno, JavaScript ES6+ sem framework
 - ✅ **Consumo de APIs REST** — 3 APIs públicas + 1 backend próprio, com tratamento de erros
 - ✅ **CRUD completo** — Create, Read, Update, Delete persistidos em backend
+- ✅ **Autenticação** — Parse Users, favoritos privados por conta (ACL)
 - ✅ **Visualizações complexas** — Three.js (3D) e Chart.js (dados)
 - ✅ **UX cuidada** — efeitos visuais, lightbox, toasts, responsividade, animações não-intrusivas
 - ✅ **Qualidade de código** — SonarQube, SRI, sanitização XSS, módulos ES, acessibilidade
@@ -309,14 +312,15 @@ nasa_explorer/
 │   ├── ui.js              # Menu, spotlight, toasts, lightbox
 │   ├── dom.js             # Helpers de sanitização e a11y
 │   ├── nasa.js            # Cliente das APIs da NASA
-│   ├── parse.js           # Cliente do Back4app (CRUD)
+│   ├── parse.js           # Back4app: auth + CRUD de favoritos
+│   ├── authMessages.js    # Mensagens de erro de login/cadastro
 │   ├── earthScene.js      # Cena 3D da Terra com Three.js
 │   └── pages/             # Lógica de cada página
 ├── tests/                 # Vitest (normalização de APIs + sanitização)
 ├── index.html             # Home + APOD
 ├── neo.html               # Asteroides + Terra 3D + Charts
 ├── mars.html              # Image Library com busca
-├── favoritos.html         # Coleção pessoal (CRUD completo)
+├── favoritos.html         # Login + coleção pessoal (CRUD privado)
 ├── 404.html               # Página de erro
 ├── robots.txt · sitemap.xml · vercel.json
 ├── LICENSE
@@ -327,7 +331,7 @@ nasa_explorer/
 
 Ideias exploradas para próximas versões (contribuições e forks são bem-vindos):
 
-- [ ] Autenticação com Parse Users (favoritos privados por usuário)
+- [x] Autenticação com Parse Users (favoritos privados por usuário)
 - [x] Mover chave da NASA API para serverless function na Vercel
 - [x] Migrar Tailwind CDN para CSS compilado
 - [x] Adicionar testes automatizados (Vitest + GitHub Actions)

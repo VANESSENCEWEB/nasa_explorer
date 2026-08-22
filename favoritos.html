@@ -15,7 +15,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
   <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
-  <meta name="description" content="Sua coleção pessoal de favoritos do NASA Explorer — fotos astronômicas, asteroides e imagens salvas no Back4app." />
+  <meta name="description" content="Entre na sua conta para ver a coleção pessoal de favoritos do NASA Explorer — privada, com CRUD no Back4app." />
 
   <meta property="og:title" content="Favoritos · NASA Explorer" />
   <meta property="og:description" content="Coleção pessoal salva no Back4app com CRUD completo." />
@@ -62,11 +62,12 @@
           </svg>
           <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
         </a>
-        <div class="hidden md:flex gap-7 text-xs">
+        <div class="hidden md:flex gap-7 text-xs items-center">
           <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
           <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
           <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
           <a href="favoritos.html" class="text-glow font-medium" aria-current="page">Favoritos</a>
+          <div id="auth-nav"></div>
         </div>
         <button type="button" id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
           <span class="ham-line"></span>
@@ -81,6 +82,7 @@
         <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
         <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
         <a href="favoritos.html" class="text-glow font-medium text-sm tracking-wide" aria-current="page">Favoritos</a>
+        <div id="auth-nav-mobile" class="pt-2 border-t border-white/10"></div>
       </div>
     </div>
   </header>
@@ -91,25 +93,55 @@
       Coleção pessoal
     </h1>
     <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
-      Tudo que você marcou como favorito está salvo aqui. Os dados ficam
-      no <strong>Back4app</strong>, então não somem mesmo se fechar o navegador.
-      Você pode adicionar uma nota pessoal e remover quando quiser.
+      Cada conta tem seus próprios favoritos. Entre para ver, anotar e remover
+      o que você salvou — os dados ficam no <strong>Back4app</strong> e não
+      misturam com os de outras pessoas.
     </p>
 
-    <p id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6" aria-live="polite">
-      CARREGANDO FAVORITOS...
-    </p>
+    <section id="painel-auth" class="auth-card hidden max-w-md" aria-labelledby="auth-titulo">
+      <h2 id="auth-titulo" class="text-white text-lg font-medium mb-1">Acesse sua coleção</h2>
+      <p class="text-slate-500 text-xs mb-5">E-mail e senha. Sem redes sociais, só Parse Users.</p>
 
-    <section id="lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Favoritos salvos"></section>
+      <div class="auth-tabs" role="tablist" aria-label="Entrar ou criar conta">
+        <button type="button" id="tab-entrar" class="auth-tab is-active" role="tab" aria-selected="true">Entrar</button>
+        <button type="button" id="tab-cadastrar" class="auth-tab" role="tab" aria-selected="false">Criar conta</button>
+      </div>
 
-    <div id="vazio" class="hidden text-center py-20">
-      <p class="text-slate-500 text-sm mb-2">Nenhum favorito ainda.</p>
-      <p class="text-slate-600 text-xs">
-        Vá até <a href="index.html" class="text-glow hover:underline">Home</a>,
-        <a href="neo.html" class="text-glow hover:underline">NEO Watch</a> ou
-        <a href="mars.html" class="text-glow hover:underline">Image Library</a>
-        e clique nas estrelas para começar.
+      <form id="form-auth" class="flex flex-col gap-3">
+        <label class="auth-label" for="auth-email">E-mail</label>
+        <input type="email" id="auth-email" name="email" required autocomplete="username" class="auth-input" />
+
+        <label class="auth-label" for="auth-senha">Senha</label>
+        <input type="password" id="auth-senha" name="password" required minlength="6" autocomplete="current-password" class="auth-input" />
+
+        <div id="auth-confirma-wrap" class="hidden">
+          <label class="auth-label" for="auth-confirma">Confirmar senha</label>
+          <input type="password" id="auth-confirma" name="confirm" minlength="6" autocomplete="new-password" class="auth-input" />
+        </div>
+
+        <p id="auth-erro" class="hidden text-xs text-nasa" role="alert"></p>
+        <button type="submit" id="btn-auth" class="bg-nasa text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition mt-1">
+          Entrar
+        </button>
+      </form>
+    </section>
+
+    <div id="painel-colecao" class="hidden">
+      <p id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6" aria-live="polite">
+        CARREGANDO FAVORITOS...
       </p>
+
+      <section id="lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Favoritos salvos"></section>
+
+      <div id="vazio" class="hidden text-center py-20">
+        <p class="text-slate-500 text-sm mb-2">Nenhum favorito nesta conta ainda.</p>
+        <p class="text-slate-600 text-xs">
+          Vá até <a href="index.html" class="text-glow hover:underline">Home</a>,
+          <a href="neo.html" class="text-glow hover:underline">NEO Watch</a> ou
+          <a href="mars.html" class="text-glow hover:underline">Image Library</a>
+          e clique nas estrelas para começar.
+        </p>
+      </div>
     </div>
   </main>
 

@@ -1,7 +1,7 @@
 import { fetchApod, fetchNeoFeed } from '../nasa.js';
-import { criarFavorito, estaSalvo, deletarFavorito, listarFavoritos } from '../parse.js';
+import { criarFavorito, estaSalvo, deletarFavorito, listarFavoritos, usuarioAtual } from '../parse.js';
 import { $, isSafeHttpUrl, prefersReducedMotion } from '../dom.js';
-import { mostrarToast, abrirLightbox } from '../ui.js';
+import { mostrarToast, abrirLightbox, lidarErroFavorito } from '../ui.js';
 
 export function iniciarHome() {
   const container = $('apod-container');
@@ -132,7 +132,9 @@ export function iniciarHome() {
       carregarStatFavs();
     } catch (erro) {
       console.error(erro);
-      mostrarToast('Não foi possível atualizar o favorito.', 'erro');
+      if (!lidarErroFavorito(erro)) {
+        mostrarToast('Não foi possível atualizar o favorito.', 'erro');
+      }
     } finally {
       btnFavoritar.disabled = false;
     }
@@ -153,6 +155,10 @@ export function iniciarHome() {
   async function carregarStatFavs() {
     const el = $('stat-favs');
     if (!el) return;
+    if (!usuarioAtual()) {
+      el.textContent = '—';
+      return;
+    }
     try {
       const favs = await listarFavoritos();
       el.textContent = String(favs.length);
