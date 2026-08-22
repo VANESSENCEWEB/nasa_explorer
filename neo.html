@@ -3,45 +3,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NEO Watch · NASA Explorer</title>
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a0e27" />
+  <meta name="author" content="Vanessa Rafaella Carneiro de Lima" />
+  <title>NEO Watch · Asteroides próximos da Terra · NASA Explorer</title>
 
+  <link rel="canonical" href="https://nasa-explorer-nine-rho.vercel.app/neo.html" />
+  <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
-  <!-- Favicon -->
- <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
-<link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
-<link rel="manifest" href="./assets/favicon/site.webmanifest" />
+  <meta name="description" content="NEO Watch: asteroides que vão passar perto da Terra nos próximos 7 dias, com Terra 3D, gráficos e tabela." />
 
-<!-- Descrição da página (SEO) -->
-  <meta name="description" content="NEO Watch · NASA Explorer - Asteroides que vão passar perto da Terra nos próximos 7 dias." />
-
-  <!-- Open Graph (preview ao compartilhar no WhatsApp, LinkedIn, etc) -->
   <meta property="og:title" content="NEO Watch · NASA Explorer" />
   <meta property="og:description" content="Asteroides que vão passar perto da Terra nos próximos 7 dias." />
   <meta property="og:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
-  <meta property="og:url" content="https://nasa-explorer-nine-rho.vercel.app/" />
+  <meta property="og:url" content="https://nasa-explorer-nine-rho.vercel.app/neo.html" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NASA Explorer" />
+  <meta property="og:locale" content="pt_BR" />
 
-  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="NEO Watch· NASA Explorer" />
+  <meta name="twitter:title" content="NEO Watch · NASA Explorer" />
   <meta name="twitter:description" content="Asteroides que vão passar perto da Terra nos próximos 7 dias." />
   <meta name="twitter:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
 
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://api.nasa.gov" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-  <!-- CSS global com video de fundo -->
-<link rel="stylesheet" href="./css/global.css" />
+  <link rel="stylesheet" href="./css/global.css" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-   <script src="https://unpkg.com/parse@8.6.0/dist/parse.min.js" integrity="sha384-mS6zsCyMgxxldn4JcapLdc0ezjREPuccmei8iMz5hIP4I8fykcTHK95bXrGZLytA" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
-
+  <script src="./js/tailwind-config.js"></script>
+  <script src="https://unpkg.com/parse@8.6.0/dist/parse.min.js" integrity="sha384-mS6zsCyMgxxldn4JcapLdc0ezjREPuccmei8iMz5hIP4I8fykcTHK95bXrGZLytA" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" crossorigin="anonymous"></script>
   <script type="importmap">
     {
       "imports": {
@@ -49,113 +47,56 @@
       }
     }
   </script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          }
-        }
-      }
-    };
-  </script>
-
-  <style>
-    body { background: #0a0e27; }
-
-    /* === MOBILE MENU (hamburger) === */
-    .mobile-menu {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.3s ease;
-      opacity: 0;
-    }
-    .mobile-menu.is-open {
-      max-height: 320px;
-      opacity: 1;
-    }
-    .ham-line {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background: #e2e8f0;
-      border-radius: 2px;
-      transition: transform 0.3s ease, opacity 0.25s ease;
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(1) {
-      transform: translateY(6px) rotate(45deg);
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(2) {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(3) {
-      transform: translateY(-6px) rotate(-45deg);
-    }
-  </style>
 </head>
 
 <body class="font-sans text-slate-200 min-h-screen">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- Vídeo de fundo (galáxia) com overlay escuro -->
- <video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-  <source src="./assets/galaxy.mp4" type="video/mp4" />
-</video>
+  <video class="bg-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+    <source src="./assets/galaxy.mp4" type="video/mp4" />
+  </video>
   <div class="bg-overlay"></div>
+  <div class="spotlight" id="spotlight"></div>
 
-  <!-- Spotlight cursor (segue o mouse iluminando) -->
-<div class="spotlight" id="spotlight"></div>
-
-
-  <nav class="border-b border-white/10 py-4 relative">
-    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-      <a href="index.html" class="flex items-center gap-2.5 group">
-        <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
-          <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
-          <g>
-            <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
-          </g>
-        </svg>
-        <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
-      </a>
-
-      <!-- Links desktop -->
-      <div class="hidden md:flex gap-7 text-xs">
-        <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
-        <a href="neo.html" class="text-glow font-medium">NEO Watch</a>
-        <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
-        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
+  <header>
+    <nav class="border-b border-white/10 py-4 relative" aria-label="Principal">
+      <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2.5 group">
+          <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
+            <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
+            <g>
+              <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
+            </g>
+          </svg>
+          <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
+        </a>
+        <div class="hidden md:flex gap-7 text-xs">
+          <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+          <a href="neo.html" class="text-glow font-medium" aria-current="page">NEO Watch</a>
+          <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
+          <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
+        </div>
+        <button type="button" id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+        </button>
       </div>
-
-      <!-- Hamburger (mobile) -->
-      <button id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false">
-        <span class="ham-line"></span>
-        <span class="ham-line"></span>
-        <span class="ham-line"></span>
-      </button>
+    </nav>
+    <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
+        <a href="index.html" class="text-slate-400 hover:text-white transition-colors text-sm">Home</a>
+        <a href="neo.html" class="text-glow font-medium text-sm tracking-wide" aria-current="page">NEO Watch</a>
+        <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
+        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
+      </div>
     </div>
-  </nav>
+  </header>
 
-  <!-- Mobile Menu -->
-  <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
-      <a href="index.html" class="text-slate-400 hover:text-white transition-colors text-sm">Home</a>
-      <a href="neo.html" class="text-glow font-medium text-sm tracking-wide">NEO Watch</a>
-      <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
-      <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
-    </div>
-  </div>
-
-  <main class="max-w-6xl mx-auto px-6 py-12">
-
-    <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NEAR-EARTH OBJECT WATCH</div>
+  <main id="conteudo" class="max-w-6xl mx-auto px-6 py-12">
+    <p class="text-[11px] text-glow tracking-[0.2em] mb-3">NEAR-EARTH OBJECT WATCH</p>
     <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
       Asteroides próximos da Terra
     </h1>
@@ -167,14 +108,14 @@
     </p>
 
     <div class="relative rounded-2xl overflow-hidden bg-black border border-white/10 mb-10">
-      <canvas id="earth-canvas" class="block w-full" style="height: 320px;"></canvas>
+      <canvas id="earth-canvas" class="block w-full" style="height: 320px;" aria-label="Visualização 3D da Terra com asteroides em órbita"></canvas>
     </div>
 
-    <div id="status" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-8">
+    <p id="status" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-8" aria-live="polite">
       CARREGANDO ASTEROIDES...
-    </div>
+    </p>
 
-    <section id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 hidden">
+    <section id="stats" class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6 hidden" aria-label="Resumo dos asteroides">
       <div class="bg-white/[0.03] border border-white/10 rounded-xl p-4">
         <div class="text-[10px] text-slate-400 tracking-widest uppercase mb-2">Total</div>
         <div class="text-2xl font-mono font-medium text-white" id="stat-total">—</div>
@@ -193,17 +134,17 @@
       </div>
     </section>
 
-    <section id="graficos" class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6 hidden">
+    <section id="graficos" class="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6 hidden" aria-label="Gráficos">
       <div class="lg:col-span-2 bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-        <h3 class="text-sm font-medium text-white mb-4">Asteroides por dia</h3>
+        <h2 class="text-sm font-medium text-white mb-4">Asteroides por dia</h2>
         <div style="height: 240px;">
-          <canvas id="grafico-barras"></canvas>
+          <canvas id="grafico-barras" aria-label="Gráfico de barras de asteroides por dia"></canvas>
         </div>
       </div>
       <div class="bg-white/[0.03] border border-white/10 rounded-2xl p-5">
-        <h3 class="text-sm font-medium text-white mb-4">Distribuição</h3>
+        <h2 class="text-sm font-medium text-white mb-4">Distribuição</h2>
         <div style="height: 240px;">
-          <canvas id="grafico-doughnut"></canvas>
+          <canvas id="grafico-doughnut" aria-label="Gráfico de distribuição de asteroides seguros e perigosos"></canvas>
         </div>
       </div>
     </section>
@@ -211,252 +152,35 @@
     <section id="tabela-container" class="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-12 hidden">
       <div class="overflow-x-auto">
         <table class="w-full text-xs">
+          <caption class="sr-only">Lista dos 20 asteroides mais relevantes do período, com diâmetro, distância e status</caption>
           <thead>
             <tr class="text-[10px] text-slate-500 tracking-widest uppercase border-b border-white/10">
-              <th class="text-left py-3 px-2 font-medium">Nome</th>
-              <th class="text-left py-3 px-2 font-medium">Data</th>
-              <th class="text-left py-3 px-2 font-medium">Diâmetro</th>
-              <th class="text-left py-3 px-2 font-medium">Distância</th>
-              <th class="text-left py-3 px-2 font-medium">Velocidade</th>
-              <th class="text-left py-3 px-2 font-medium">Status</th>
-              <th class="text-right py-3 px-2 font-medium">★</th>
+              <th scope="col" class="text-left py-3 px-2 font-medium">Nome</th>
+              <th scope="col" class="text-left py-3 px-2 font-medium">Data</th>
+              <th scope="col" class="text-left py-3 px-2 font-medium">Diâmetro</th>
+              <th scope="col" class="text-left py-3 px-2 font-medium">Distância</th>
+              <th scope="col" class="text-left py-3 px-2 font-medium">Velocidade</th>
+              <th scope="col" class="text-left py-3 px-2 font-medium">Status</th>
+              <th scope="col" class="text-right py-3 px-2 font-medium">Favorito</th>
             </tr>
           </thead>
           <tbody id="tabela-corpo"></tbody>
         </table>
       </div>
     </section>
-
   </main>
 
   <footer class="border-t border-white/5 py-6 text-center">
-    <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
-      NASA EXPLORER · 2026
-    </div>
+    <p class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
+      NASA EXPLORER · 2026 · Vanessa Lima
+    </p>
   </footer>
 
   <script type="module">
-    import { fetchNeoFeed } from './js/nasa.js';
-    import { criarCenaDaTerra } from './js/earthScene.js';
-    import { criarFavorito, estaSalvo, deletarFavorito } from './js/parse.js';
-
-    const status = document.getElementById('status');
-    const stats = document.getElementById('stats');
-    const tabelaContainer = document.getElementById('tabela-container');
-    const tabelaCorpo = document.getElementById('tabela-corpo');
-
-    const favoritados = new Map(); // nasaId → id do favorito
-
-    function getIntervaloPadrao() {
-      const hoje = new Date();
-      const inicio = new Date();
-      inicio.setDate(hoje.getDate() - 6);
-      return {
-        inicio: inicio.toISOString().split('T')[0],
-        fim: hoje.toISOString().split('T')[0]
-      };
-    }
-
-    function formatarData(isoDate) {
-      return new Date(isoDate + 'T00:00:00').toLocaleDateString('pt-BR', {
-        day: '2-digit', month: 'short'
-      });
-    }
-
-    async function carregar() {
-      try {
-        const { inicio, fim } = getIntervaloPadrao();
-        const asteroides = await fetchNeoFeed(inicio, fim);
-
-        status.classList.add('hidden');
-        stats.classList.remove('hidden');
-        tabelaContainer.classList.remove('hidden');
-
-        const perigosos = asteroides.filter(a => a.perigoso);
-        document.getElementById('stat-total').textContent = asteroides.length;
-        document.getElementById('stat-perigosos').textContent = perigosos.length;
-        document.getElementById('stat-proximo').textContent =
-          asteroides[0].distancia_lunar.toFixed(1) + ' LD';
-
-        const maisRapido = Math.max(...asteroides.map(a => a.velocidade));
-        document.getElementById('stat-rapido').textContent =
-          maisRapido.toFixed(1) + ' km/s';
-
-        criarCenaDaTerra(document.getElementById('earth-canvas'), asteroides);
-        document.getElementById('graficos').classList.remove('hidden');
-
-        // Gráfico de barras
-        const contagem_por_dia = {};
-        for (const a of asteroides) {
-          if (!contagem_por_dia[a.data]) contagem_por_dia[a.data] = { seguros: 0, perigosos: 0 };
-          if (a.perigoso) contagem_por_dia[a.data].perigosos++;
-          else contagem_por_dia[a.data].seguros++;
-        }
-
-        const datas_ordenadas = Object.keys(contagem_por_dia).sort();
-        const labels = datas_ordenadas.map(formatarData);
-        const dados_seguros = datas_ordenadas.map(d => contagem_por_dia[d].seguros);
-        const dados_perigosos = datas_ordenadas.map(d => contagem_por_dia[d].perigosos);
-
-        new Chart(document.getElementById('grafico-barras'), {
-          type: 'bar',
-          data: {
-            labels: labels,
-            datasets: [
-              { label: 'Seguros', data: dados_seguros, backgroundColor: '#06b6d4', borderRadius: 3 },
-              { label: 'Perigosos', data: dados_perigosos, backgroundColor: '#fc3d21', borderRadius: 3 }
-            ]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 } }
-            },
-            scales: {
-              x: { stacked: true, grid: { display: false }, ticks: { color: '#64748b', font: { size: 10 } } },
-              y: { stacked: true, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { size: 10 }, stepSize: 1 }, beginAtZero: true }
-            }
-          }
-        });
-
-        const total_seguros = asteroides.filter(a => !a.perigoso).length;
-        const total_perigosos = asteroides.filter(a => a.perigoso).length;
-
-        new Chart(document.getElementById('grafico-doughnut'), {
-          type: 'doughnut',
-          data: {
-            labels: ['Seguros', 'Perigosos'],
-            datasets: [{
-              data: [total_seguros, total_perigosos],
-              backgroundColor: ['#06b6d4', '#fc3d21'],
-              borderColor: '#0a0e27',
-              borderWidth: 2
-            }]
-          },
-          options: {
-            responsive: true, maintainAspectRatio: false, cutout: '65%',
-            plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 }, padding: 12 } } }
-          }
-        });
-
-        // Monta tabela com top 20 e checa favoritos.
-        const perigososOrdenados = asteroides.filter(a => a.perigoso);
-        const segurosOrdenados = asteroides.filter(a => !a.perigoso);
-        const top20 = [...perigososOrdenados, ...segurosOrdenados].slice(0, 20);
-
-        // Checa favoritos em paralelo.
-        favoritados.clear();
-        await Promise.all(top20.map(async a => {
-          const id = await estaSalvo(a.id);
-          if (id) favoritados.set(a.id, id);
-        }));
-
-        tabelaCorpo.innerHTML = top20.map(a => {
-          const tag = a.perigoso
-            ? '<span class="bg-red-500/15 text-red-300 px-2 py-0.5 rounded text-[10px] tracking-wider">PERIGOSO</span>'
-            : '<span class="bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded text-[10px] tracking-wider">SEGURO</span>';
-
-          const salvo = favoritados.has(a.id);
-          const estrela = salvo ? '★' : '☆';
-          const corEstrela = salvo ? 'text-glow' : 'text-slate-600 hover:text-white';
-
-          return `
-            <tr class="border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
-              <td class="py-2.5 px-2 text-white">${a.nome}</td>
-              <td class="py-2.5 px-2 text-slate-400">${formatarData(a.data)}</td>
-              <td class="py-2.5 px-2 font-mono text-slate-300">${a.diametro} m</td>
-              <td class="py-2.5 px-2 font-mono text-slate-300">${a.distancia_lunar.toFixed(2)} LD</td>
-              <td class="py-2.5 px-2 font-mono text-slate-300">${a.velocidade.toFixed(1)} km/s</td>
-              <td class="py-2.5 px-2">${tag}</td>
-              <td class="py-2.5 px-2 text-right">
-                <button class="btn-fav ${corEstrela} text-base transition" data-nasa-id="${a.id}" data-nome="${a.nome}" data-perigoso="${a.perigoso}">${estrela}</button>
-              </td>
-            </tr>
-          `;
-        }).join('');
-
-        // Eventos de favoritar.
-        document.querySelectorAll('.btn-fav').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const nasaId = btn.dataset.nasaId;
-            const nome = btn.dataset.nome;
-            const perigoso = btn.dataset.perigoso === 'true';
-
-            btn.disabled = true;
-
-            try {
-              if (favoritados.has(nasaId)) {
-                await deletarFavorito(favoritados.get(nasaId));
-                favoritados.delete(nasaId);
-                btn.textContent = '☆';
-                btn.className = 'btn-fav text-base transition text-slate-600 hover:text-white';
-              } else {
-                const salvo = await criarFavorito({
-                  tipo: 'neo',
-                  nasaId,
-                  titulo: `Asteroide ${nome}${perigoso ? ' (perigoso)' : ''}`,
-                  imageUrl: ''
-                });
-                favoritados.set(nasaId, salvo.id);
-                btn.textContent = '★';
-                btn.className = 'btn-fav text-base transition text-glow';
-              }
-            } catch (e) {
-              console.error(e);
-            } finally {
-              btn.disabled = false;
-            }
-          });
-        });
-
-      } catch (erro) {
-        console.error(erro);
-        status.innerHTML = `<span class="text-nasa">ERRO · ${erro.message}</span>`;
-      }
-    }
-
-    carregar();
+    import { iniciarInterface } from './js/ui.js';
+    import { iniciarNeo } from './js/pages/neo.js';
+    iniciarInterface();
+    iniciarNeo();
   </script>
-
-<script>
-  // Faz o spotlight (luz do mouse) seguir o cursor pela página.
-  const spotlight = document.getElementById('spotlight');
-  if (spotlight) {
-    document.addEventListener('mousemove', (e) => {
-      spotlight.style.setProperty('--mouse-x', e.clientX + 'px');
-      spotlight.style.setProperty('--mouse-y', e.clientY + 'px');
-    });
-  }
-
-  // Hamburger menu toggle
-  const hamburgerBtn = document.getElementById('hamburger-btn');
-  const mobileMenu   = document.getElementById('mobile-menu');
-  if (hamburgerBtn && mobileMenu) {
-    hamburgerBtn.addEventListener('click', () => {
-      const isOpen = mobileMenu.classList.toggle('is-open');
-      hamburgerBtn.classList.toggle('is-open', isOpen);
-      hamburgerBtn.setAttribute('aria-expanded', isOpen);
-    });
-    // Fecha ao clicar em link do menu mobile
-    mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.remove('is-open');
-        hamburgerBtn.classList.remove('is-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
-      });
-    });
-  }
-
-  // Glow nos cards: gradient segue o mouse dentro do card.
-  document.querySelectorAll('.card-glow').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty('--card-x', (e.clientX - rect.left) + 'px');
-      card.style.setProperty('--card-y', (e.clientY - rect.top) + 'px');
-    });
-  });
-</script>
-
 </body>
 </html>

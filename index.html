@@ -3,27 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NASA Explorer</title>
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a0e27" />
+  <meta name="author" content="Vanessa Rafaella Carneiro de Lima" />
+  <title>NASA Explorer · Foto astronômica, asteroides e acervo da NASA</title>
 
-  <!-- Favicons -->
+  <link rel="canonical" href="https://nasa-explorer-nine-rho.vercel.app/" />
   <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
   <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
   <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
   <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
-  <!-- SEO -->
   <meta name="description" content="Painel que conecta você ao acervo da NASA — fotos astronômicas, asteroides próximos da Terra em 3D e sua coleção pessoal de favoritos." />
 
-  <!-- Open Graph -->
   <meta property="og:title" content="NASA Explorer" />
   <meta property="og:description" content="Explore o cosmos em tempo real com dados públicos da NASA." />
   <meta property="og:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
   <meta property="og:url" content="https://nasa-explorer-nine-rho.vercel.app/" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NASA Explorer" />
+  <meta property="og:locale" content="pt_BR" />
 
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="NASA Explorer" />
   <meta name="twitter:description" content="Explore o cosmos em tempo real com a NASA." />
@@ -31,681 +32,256 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://api.nasa.gov" />
+  <link rel="dns-prefetch" href="https://parseapi.back4app.com" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="./css/global.css" />
 
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://npmcdn.com/parse/dist/parse.min.js"></script>
+  <script src="./js/tailwind-config.js"></script>
+  <script src="https://unpkg.com/parse@8.6.0/dist/parse.min.js" integrity="sha384-mS6zsCyMgxxldn4JcapLdc0ezjREPuccmei8iMz5hIP4I8fykcTHK95bXrGZLytA" crossorigin="anonymous"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          }
-        }
-      }
-    };
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "NASA Explorer",
+    "url": "https://nasa-explorer-nine-rho.vercel.app/",
+    "description": "Dashboard interativo com a foto astronômica do dia, asteroides próximos da Terra em 3D e busca no acervo da NASA.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "Any",
+    "inLanguage": "pt-BR",
+    "author": {
+      "@type": "Person",
+      "name": "Vanessa Rafaella Carneiro de Lima",
+      "url": "https://github.com/VANESSENCEWEB"
+    }
+  }
   </script>
-
-  <style>
-    .cursor-blink::after {
-      content: '_';
-      animation: blink 1s step-end infinite;
-      color: #06b6d4;
-      margin-left: 2px;
-    }
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      50.01%, 100% { opacity: 0; }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { animation: fadeUp 0.8s ease-out both; }
-
-    .title-glow {
-      background: linear-gradient(180deg, #ffffff 0%, #94a3b8 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: transparent;
-    }
-
-    @keyframes scan {
-      0% { transform: translateX(-100%); }
-      100% { transform: translateX(100%); }
-    }
-    .scan-line {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, #06b6d4, transparent);
-      animation: scan 3s linear infinite;
-    }
-
-    /* MOBILE MENU */
-    .mobile-menu {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.3s ease;
-      opacity: 0;
-    }
-    .mobile-menu.is-open {
-      max-height: 320px;
-      opacity: 1;
-    }
-    .ham-line {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background: #e2e8f0;
-      border-radius: 2px;
-      transition: transform 0.3s ease, opacity 0.25s ease;
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(1) {
-      transform: translateY(6px) rotate(45deg);
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(2) {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(3) {
-      transform: translateY(-6px) rotate(-45deg);
-    }
-
-    /* HERO HUD */
-    .hud-corner {
-      position: absolute;
-      width: 48px; height: 48px;
-      pointer-events: none;
-    }
-    .hud-corner::before, .hud-corner::after {
-      content: '';
-      position: absolute;
-      background: #06b6d4;
-      opacity: 0;
-      animation: hud-appear 1s ease 0.8s forwards;
-    }
-    .hud-corner::before { width: 100%; height: 1px; top: 0; left: 0; }
-    .hud-corner::after  { width: 1px; height: 100%; top: 0; left: 0; }
-    .hud-tl { top: 0; left: 0; }
-    .hud-tr { top: 0; right: 0; transform: scaleX(-1); }
-    .hud-bl { bottom: 0; left: 0; transform: scaleY(-1); }
-    .hud-br { bottom: 0; right: 0; transform: scale(-1,-1); }
-    @keyframes hud-appear { to { opacity: 0.3; } }
-
-    .hero-coord {
-      position: absolute;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      color: #334155;
-      letter-spacing: 0.15em;
-      pointer-events: none;
-      opacity: 0;
-      animation: deco-fade 1s ease 1.3s forwards;
-    }
-    .hero-coord-tl { top: 0.6rem; left: 0.75rem; }
-    .hero-coord-br { bottom: 0.6rem; right: 0.75rem; }
-    @keyframes deco-fade { to { opacity: 0.65; } }
-
-    .hero-label-v {
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%) rotate(90deg);
-      transform-origin: center center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 9px;
-      letter-spacing: 0.25em;
-      color: #334155;
-      text-transform: uppercase;
-      white-space: nowrap;
-      pointer-events: none;
-      opacity: 0;
-      animation: deco-fade 1s ease 1.5s forwards;
-    }
-
-    .scroll-hint-line {
-      width: 1px;
-      height: 36px;
-      background: linear-gradient(to bottom, #06b6d4, transparent);
-      animation: scroll-pulse 2s ease infinite;
-    }
-    @keyframes scroll-pulse {
-      0%, 100% { opacity: 0.4; transform: scaleY(1); }
-      50%       { opacity: 1;   transform: scaleY(1.3); }
-    }
-    .scroll-hint-text {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 8px;
-      letter-spacing: 0.25em;
-      color: #475569;
-      text-transform: uppercase;
-      writing-mode: vertical-rl;
-      transform: rotate(180deg);
-    }
-
-    .hero-tw-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 0.85em;
-      background: #06b6d4;
-      vertical-align: middle;
-      margin-left: 2px;
-      animation: blink 0.8s step-end infinite;
-    }
-
-    /* Isolado do .title-glow: background-clip no pai fazia "cosmos"
-       renderizar em camada dupla (texto + fantasma cinza). */
-    .cosmos-glitch {
-      position: relative;
-      display: inline-block;
-      color: #ffffff;
-      background: none;
-      -webkit-background-clip: unset;
-      background-clip: unset;
-      -webkit-text-fill-color: #ffffff;
-      animation: cosmos-glitch 7s steps(1) infinite;
-    }
-    @keyframes cosmos-glitch {
-      0%,84%,100% {
-        color: #fff;
-        -webkit-text-fill-color: #fff;
-        text-shadow: none;
-        transform: none;
-      }
-      85% {
-        color: #39c7fb;
-        -webkit-text-fill-color: #39c7fb;
-        text-shadow: 3px 0 0 rgba(6, 182, 212, 0.55), -3px 0 0 rgba(7, 51, 196, 0.45);
-        transform: translateX(2px);
-      }
-      87% {
-        color: #fff;
-        -webkit-text-fill-color: #fff;
-        text-shadow: -2px 0 0 rgba(6, 182, 212, 0.5);
-        transform: translateX(-1px);
-      }
-      89% {
-        color: #06b6d4;
-        -webkit-text-fill-color: #06b6d4;
-        text-shadow: 2px 0 0 rgba(252, 61, 33, 0.55);
-        transform: translateX(1px);
-      }
-      91% {
-        color: #fff;
-        -webkit-text-fill-color: #fff;
-        text-shadow: none;
-        transform: none;
-      }
-    }
-
-    /* TÍTULOS DE SEÇÃO */
-    .section-title {
-      font-family: 'Outfit', sans-serif;
-      font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-      font-weight: 300;
-      letter-spacing: -0.02em;
-      color: #ffffff;
-      line-height: 1.1;
-      margin-bottom: 0.5rem;
-    }
-    .section-eyebrow {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      color: #06b6d4;
-      margin-bottom: 0.75rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .section-eyebrow::before {
-      content: '';
-      width: 24px;
-      height: 1px;
-      background: #06b6d4;
-    }
-    .section-description {
-      font-size: 14px;
-      color: #94a3b8;
-      max-width: 600px;
-      line-height: 1.6;
-      margin-bottom: 2rem;
-    }
-
-    /* CARDS ESCUROS */
-    .card-dark {
-      background: rgba(2, 6, 23, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      transition: border-color 0.3s ease, background 0.3s ease, transform 0.3s ease;
-    }
-    .card-dark:hover {
-      background: rgba(2, 6, 23, 0.4);
-      border-color: rgba(6, 182, 212, 0.4);
-      transform: translateY(-2px);
-    }
-
-    @media (max-width: 768px) {
-      .hero-label-v { display: none; }
-      .hero-coord    { display: none; }
-      .hud-corner    { width: 32px; height: 32px; }
-    }
-  </style>
 </head>
 
 <body class="font-sans text-slate-200 min-h-screen">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- Vídeo de fundo -->
-  <video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
+  <video class="bg-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
     <source src="./assets/galaxy.mp4" type="video/mp4" />
   </video>
   <div class="bg-overlay"></div>
-
-  <!-- Spotlight -->
   <div class="spotlight" id="spotlight"></div>
 
-  <nav class="border-b border-white/10 py-4 relative">
-    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-      <a href="index.html" class="flex items-center gap-2.5 group">
-        <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
-          <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
-          <g>
-            <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
-          </g>
-        </svg>
-        <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
-      </a>
-      <div class="hidden md:flex gap-7 text-xs">
-        <a href="index.html" class="text-glow font-medium">Home</a>
-        <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
-        <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
-        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
-      </div>
-
-      <button id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false">
-        <span class="ham-line"></span>
-        <span class="ham-line"></span>
-        <span class="ham-line"></span>
-      </button>
-    </div>
-  </nav>
-
-  <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
-      <a href="index.html" class="text-glow font-medium text-sm tracking-wide">Home</a>
-      <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
-      <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
-      <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
-    </div>
-  </div>
-
-  <!-- HERO CENTRALIZADO + GRANDE -->
-  <section class="relative max-w-7xl mx-auto px-6 py-24 md:py-40" id="hero-section">
-
-    <div class="hud-corner hud-tl"></div>
-    <div class="hud-corner hud-tr"></div>
-    <div class="hud-corner hud-bl"></div>
-    <div class="hud-corner hud-br"></div>
-
-    <div class="hero-coord hero-coord-tl">RA 17h 45m 40s · DEC −29° 00' 28"</div>
-    <div class="hero-coord hero-coord-br">MILKY WAY CORE · DST 26,000 LY · NASA/JPL</div>
-
-    <div class="hero-label-v">NASA Explorer — Real-Time Data · 2026</div>
-
-    <!-- Conteúdo centralizado -->
-    <div class="flex flex-col items-center text-center max-w-5xl mx-auto">
-
-      <div class="font-mono text-[10px] tracking-[0.2em] text-glow mb-6 fade-up flex items-center gap-3">
-        <span class="w-1.5 h-1.5 rounded-full bg-glow animate-pulse"></span>
-        <span>SYSTEM ONLINE · CONNECTED TO api.nasa.gov</span>
-      </div>
-
-      <h1 class="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light tracking-tight leading-[0.95] mb-8 fade-up" style="animation-delay: 0.1s;">
-        <span class="title-glow">Explore o</span><br/>
-        <span class="font-medium cosmos-glitch">cosmos</span> <span class="title-glow">em</span><br/>
-        <span class="title-glow">tempo real.</span>
-      </h1>
-
-      <div class="font-mono text-xs md:text-sm text-slate-500 mb-8 fade-up" style="animation-delay: 0.25s; min-height: 1.4rem;">
-        <span id="hero-tw-text"></span><span class="hero-tw-cursor"></span>
-      </div>
-
-      <div class="font-mono text-xs md:text-sm text-slate-500 mb-10 fade-up cursor-blink" style="animation-delay: 0.4s;">
-        <span class="text-glow">$</span> initialize_explorer --mode=cosmos
-      </div>
-
-      <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay: 0.55s;">
-        <a href="neo.html" class="bg-nasa text-white rounded-lg px-7 py-3.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition flex items-center gap-2">
-          <span>Começar a explorar</span>
-          <span>→</span>
+  <header>
+    <nav class="border-b border-white/10 py-4 relative" aria-label="Principal">
+      <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2.5 group">
+          <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
+            <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
+            <g>
+              <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
+            </g>
+          </svg>
+          <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
         </a>
-        <a href="#sobre" class="bg-white/[0.05] border border-white/15 text-slate-200 rounded-lg px-7 py-3.5 text-sm font-medium hover:bg-white/10 transition">
-          Sobre o projeto
-        </a>
+        <div class="hidden md:flex gap-7 text-xs">
+          <a href="index.html" class="text-glow font-medium" aria-current="page">Home</a>
+          <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
+          <a href="mars.html" class="text-slate-400 hover:text-white transition-colors">Image Library</a>
+          <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
+        </div>
+        <button type="button" id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+        </button>
       </div>
-
-      <div class="flex flex-col items-center gap-2 mt-20 fade-up" style="animation-delay: 0.8s;">
-        <div class="scroll-hint-line"></div>
-        <span class="scroll-hint-text">scroll</span>
-      </div>
-
-    </div>
-
-    <div class="scan-line"></div>
-  </section>
-
-  <!-- SOBRE O PROJETO (com mais espaçamento do topo) -->
-  <section id="sobre" class="max-w-7xl mx-auto px-6 pt-24 pb-20">
-    <div class="section-eyebrow">sobre o projeto</div>
-    <h2 class="section-title">O que é o NASA Explorer?</h2>
-    <p class="section-description">
-      Um painel que conecta você ao acervo da NASA em tempo real. Reúno aqui três
-      experiências em um só lugar: a foto astronômica do dia direto da NASA, o
-      monitoramento de asteroides próximos da Terra com visualização 3D, e uma
-      busca em mais de 150 mil imagens do acervo espacial — tudo com uma coleção
-      pessoal de favoritos persistida em backend.
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl">
-      <div class="card-dark rounded-xl p-4">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Tecnologias</div>
-        <p class="text-xs text-slate-300 leading-relaxed">HTML, CSS, JavaScript vanilla, Tailwind CSS, Chart.js, Three.js e Back4app.</p>
-      </div>
-      <div class="card-dark rounded-xl p-4">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">APIs Públicas</div>
-        <p class="text-xs text-slate-300 leading-relaxed">NASA APOD, NASA NEO Feed e NASA Image Library — todas consumidas em tempo real.</p>
-      </div>
-      <div class="card-dark rounded-xl p-4">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">CRUD Completo</div>
-        <p class="text-xs text-slate-300 leading-relaxed">Criação, leitura, atualização e remoção de favoritos persistidos no Back4app.</p>
-      </div>
-      <div class="card-dark rounded-xl p-4">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Acadêmico</div>
-        <p class="text-xs text-slate-300 leading-relaxed">Projeto da disciplina de Programação para Web — UNICAP · 2º período de Sistemas para Internet.</p>
+    </nav>
+    <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
+        <a href="index.html" class="text-glow font-medium text-sm tracking-wide" aria-current="page">Home</a>
+        <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
+        <a href="mars.html" class="text-slate-400 hover:text-white transition-colors text-sm">Image Library</a>
+        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
       </div>
     </div>
-  </section>
+  </header>
 
-  <!-- LIVE DATA -->
-  <section id="stats" class="max-w-7xl mx-auto px-6 pb-20">
-    <div class="section-eyebrow">live data</div>
-    <h2 class="section-title">Estatísticas em tempo real</h2>
-    <p class="section-description">
-      Dados puxados diretamente das APIs da NASA e do meu backend no Back4app.
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+  <main id="conteudo">
+    <section class="relative max-w-7xl mx-auto px-6 py-24 md:py-40" id="hero-section" aria-labelledby="hero-title">
+      <div class="hud-corner hud-tl" aria-hidden="true"></div>
+      <div class="hud-corner hud-tr" aria-hidden="true"></div>
+      <div class="hud-corner hud-bl" aria-hidden="true"></div>
+      <div class="hud-corner hud-br" aria-hidden="true"></div>
+      <div class="hero-coord hero-coord-tl" aria-hidden="true">RA 17h 45m 40s · DEC −29° 00' 28"</div>
+      <div class="hero-coord hero-coord-br" aria-hidden="true">MILKY WAY CORE · DST 26,000 LY · NASA/JPL</div>
+      <div class="hero-label-v" aria-hidden="true">NASA Explorer — Real-Time Data · 2026</div>
 
-      <div class="card-dark rounded-xl p-5">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Asteroides hoje</div>
-        <div class="text-3xl font-mono font-medium text-white" id="stat-neo">—</div>
-        <div class="text-[10px] text-slate-500 mt-1">via NASA NEO API</div>
-      </div>
+      <div class="flex flex-col items-center text-center max-w-5xl mx-auto">
+        <div class="font-mono text-[10px] tracking-[0.2em] text-glow mb-6 fade-up flex items-center gap-3">
+          <span class="w-1.5 h-1.5 rounded-full bg-glow animate-pulse" aria-hidden="true"></span>
+          <span>SYSTEM ONLINE · CONNECTED TO api.nasa.gov</span>
+        </div>
 
-      <div class="card-dark rounded-xl p-5">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Imagens no acervo</div>
-        <div class="text-3xl font-mono font-medium text-white">150K+</div>
-        <div class="text-[10px] text-slate-500 mt-1">NASA Image Library</div>
-      </div>
+        <h1 id="hero-title" class="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-light tracking-tight leading-[0.95] mb-8 fade-up" style="animation-delay: 0.1s;">
+          <span class="title-glow">Explore o</span><br/>
+          <span class="font-medium cosmos-glitch">cosmos</span> <span class="title-glow">em</span><br/>
+          <span class="title-glow">tempo real.</span>
+        </h1>
 
-      <div class="card-dark rounded-xl p-5">
-        <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Favoritos salvos</div>
-        <div class="text-3xl font-mono font-medium text-white" id="stat-favs">—</div>
-        <div class="text-[10px] text-slate-500 mt-1">backend Back4app</div>
-      </div>
+        <p class="font-mono text-xs md:text-sm text-slate-500 mb-8 fade-up" style="animation-delay: 0.25s; min-height: 1.4rem;" aria-live="polite">
+          <span id="hero-tw-text"></span><span class="hero-tw-cursor" aria-hidden="true"></span>
+        </p>
 
-    </div>
-  </section>
+        <p class="font-mono text-xs md:text-sm text-slate-500 mb-10 fade-up cursor-blink" style="animation-delay: 0.4s;" aria-hidden="true">
+          <span class="text-glow">$</span> initialize_explorer --mode=cosmos
+        </p>
 
-  <!-- NAVEGUE -->
-  <section class="max-w-7xl mx-auto px-6 pb-20">
-    <div class="section-eyebrow">navegue</div>
-    <h2 class="section-title">Explore o projeto</h2>
-    <p class="section-description">
-      Cada página é uma experiência independente, com APIs e visualizações próprias.
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-      <a href="neo.html" class="card-glow card-dark group rounded-xl p-5 block">
-        <div class="text-2xl mb-3">☄️</div>
-        <h3 class="text-white text-base font-medium mb-1.5">NEO Watch</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mb-3">Asteroides próximos da Terra com Terra 3D em Three.js, gráficos e tabela.</p>
-        <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
-      </a>
+        <div class="flex flex-wrap gap-3 justify-center fade-up" style="animation-delay: 0.55s;">
+          <a href="neo.html" class="bg-nasa text-white rounded-lg px-7 py-3.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition flex items-center gap-2">
+            <span>Começar a explorar</span>
+            <span aria-hidden="true">→</span>
+          </a>
+          <a href="#sobre" class="bg-white/[0.05] border border-white/15 text-slate-200 rounded-lg px-7 py-3.5 text-sm font-medium hover:bg-white/10 transition">
+            Sobre o projeto
+          </a>
+        </div>
 
-      <a href="mars.html" class="card-glow card-dark group rounded-xl p-5 block">
-        <div class="text-2xl mb-3">🔭</div>
-        <h3 class="text-white text-base font-medium mb-1.5">Image Library</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mb-3">Busca em mais de 150 mil imagens do acervo da NASA.</p>
-        <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
-      </a>
-
-      <a href="favoritos.html" class="card-glow card-dark group rounded-xl p-5 block">
-        <div class="text-2xl mb-3">★</div>
-        <h3 class="text-white text-base font-medium mb-1.5">Favoritos</h3>
-        <p class="text-xs text-slate-400 leading-relaxed mb-3">Coleção salva no Back4app. CRUD completo.</p>
-        <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
-      </a>
-    </div>
-  </section>
-
-  <!-- DESTAQUE DO DIA -->
-  <section class="max-w-7xl mx-auto px-6 pb-20">
-    <div class="section-eyebrow">destaque do dia</div>
-    <h2 class="section-title">Foto astronômica</h2>
-    <p class="section-description">
-      Atualizada todos os dias pela NASA. Pode ser uma foto ou um vídeo
-    </p>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-      <div id="apod-container" class="relative rounded-xl overflow-hidden bg-black border border-white/10 aspect-video">
-        <div id="apod-loading" class="absolute inset-0 flex items-center justify-center">
-          <div class="text-xs font-mono text-slate-500 tracking-[0.15em]">CARREGANDO...</div>
+        <div class="flex flex-col items-center gap-2 mt-20 fade-up" style="animation-delay: 0.8s;" aria-hidden="true">
+          <div class="scroll-hint-line"></div>
+          <span class="scroll-hint-text">scroll</span>
         </div>
       </div>
-      <div>
-        <div class="flex justify-between items-start mb-3">
-          <div class="text-[11px] text-glow tracking-[0.2em] font-mono" id="apod-date-label">FOTO ASTRONÔMICA DO DIA</div>
-    <button id="btn-favoritar" class="hidden text-[13px] font-mono tracking-widest 
-    bg-white/[0.05] border border-white/20 text-slate-300 
-    rounded-full px-4 py-1.5 
-    hover:bg-[#0B4D9C] hover:border-[#00A1F4] hover:text-white 
-    hover:shadow-[0_0_20px_#00A1F4] hover:shadow-blue-500/50
-    active:scale-95 active:bg-[#083D7E]
-    transition-all duration-300 ease-out shrink-0 flex items-center gap-1.5">
-  
-  <span id="btn-favoritar-icone" class="text-lg leading-none">⭐</span>
-  <span id="btn-favoritar-texto">Salvar</span>
-</button>
+      <div class="scan-line" aria-hidden="true"></div>
+    </section>
+
+    <section id="sobre" class="max-w-7xl mx-auto px-6 pt-24 pb-20">
+      <div class="section-eyebrow">sobre o projeto</div>
+      <h2 class="section-title">O que é o NASA Explorer?</h2>
+      <p class="section-description">
+        Um painel que conecta você ao acervo da NASA em tempo real. Reúno aqui três
+        experiências em um só lugar: a foto astronômica do dia direto da NASA, o
+        monitoramento de asteroides próximos da Terra com visualização 3D, e uma
+        busca em mais de 150 mil imagens do acervo espacial — tudo com uma coleção
+        pessoal de favoritos persistida em backend.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl">
+        <div class="card-dark rounded-xl p-4">
+          <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Tecnologias</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">HTML, CSS, JavaScript vanilla, Tailwind CSS, Chart.js, Three.js e Back4app.</p>
         </div>
-        <h2 id="apod-title" class="text-2xl font-light text-white tracking-tight mb-4">&nbsp;</h2>
-        <p id="apod-explanation" class="text-slate-400 text-sm leading-relaxed mb-3 line-clamp-6">&nbsp;</p>
-        <div id="apod-copyright" class="text-xs font-mono text-slate-600 tracking-wider"></div>
+        <div class="card-dark rounded-xl p-4">
+          <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">APIs Públicas</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">NASA APOD, NASA NEO Feed e NASA Image Library — todas consumidas em tempo real.</p>
+        </div>
+        <div class="card-dark rounded-xl p-4">
+          <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">CRUD Completo</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">Criação, leitura, atualização e remoção de favoritos persistidos no Back4app.</p>
+        </div>
+        <div class="card-dark rounded-xl p-4">
+          <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Acadêmico</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">Projeto da disciplina de Programação para Web — UNICAP · 2º período de Sistemas para Internet.</p>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <section id="stats" class="max-w-7xl mx-auto px-6 pb-20" aria-live="polite">
+      <div class="section-eyebrow">live data</div>
+      <h2 class="section-title">Estatísticas em tempo real</h2>
+      <p class="section-description">
+        Dados puxados diretamente das APIs da NASA e do meu backend no Back4app.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="card-dark rounded-xl p-5">
+          <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Asteroides hoje</div>
+          <div class="text-3xl font-mono font-medium text-white" id="stat-neo">—</div>
+          <div class="text-[10px] text-slate-500 mt-1">via NASA NEO API</div>
+        </div>
+        <div class="card-dark rounded-xl p-5">
+          <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Imagens no acervo</div>
+          <div class="text-3xl font-mono font-medium text-white">150K+</div>
+          <div class="text-[10px] text-slate-500 mt-1">NASA Image Library</div>
+        </div>
+        <div class="card-dark rounded-xl p-5">
+          <div class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Favoritos salvos</div>
+          <div class="text-3xl font-mono font-medium text-white" id="stat-favs">—</div>
+          <div class="text-[10px] text-slate-500 mt-1">backend Back4app</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+      <div class="section-eyebrow">navegue</div>
+      <h2 class="section-title">Explore o projeto</h2>
+      <p class="section-description">
+        Cada página é uma experiência independente, com APIs e visualizações próprias.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <a href="neo.html" class="card-glow card-dark group rounded-xl p-5 block">
+          <div class="text-2xl mb-3" aria-hidden="true">☄️</div>
+          <h3 class="text-white text-base font-medium mb-1.5">NEO Watch</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">Asteroides próximos da Terra com Terra 3D em Three.js, gráficos e tabela.</p>
+          <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
+        </a>
+        <a href="mars.html" class="card-glow card-dark group rounded-xl p-5 block">
+          <div class="text-2xl mb-3" aria-hidden="true">🔭</div>
+          <h3 class="text-white text-base font-medium mb-1.5">Image Library</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">Busca em mais de 150 mil imagens do acervo da NASA.</p>
+          <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
+        </a>
+        <a href="favoritos.html" class="card-glow card-dark group rounded-xl p-5 block">
+          <div class="text-2xl mb-3" aria-hidden="true">★</div>
+          <h3 class="text-white text-base font-medium mb-1.5">Favoritos</h3>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">Coleção salva no Back4app. CRUD completo.</p>
+          <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
+        </a>
+      </div>
+    </section>
+
+    <section class="max-w-7xl mx-auto px-6 pb-20">
+      <div class="section-eyebrow">destaque do dia</div>
+      <h2 class="section-title">Foto astronômica</h2>
+      <p class="section-description">
+        Atualizada todos os dias pela NASA. Pode ser uma foto ou um vídeo.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <div id="apod-container" class="relative rounded-xl overflow-hidden bg-black border border-white/10 aspect-video">
+          <div id="apod-loading" class="absolute inset-0 flex items-center justify-center">
+            <div class="text-xs font-mono text-slate-500 tracking-[0.15em]">CARREGANDO...</div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between items-start mb-3 gap-3">
+            <div class="text-[11px] text-glow tracking-[0.2em] font-mono" id="apod-date-label">FOTO ASTRONÔMICA DO DIA</div>
+            <button type="button" id="btn-favoritar" aria-pressed="false" aria-label="Salvar foto nos favoritos" class="hidden text-[13px] font-mono tracking-widest
+              bg-white/[0.05] border border-white/20 text-slate-300
+              rounded-full px-4 py-1.5
+              hover:bg-[#0B4D9C] hover:border-[#00A1F4] hover:text-white
+              hover:shadow-[0_0_20px_#00A1F4] hover:shadow-blue-500/50
+              active:scale-95 active:bg-[#083D7E]
+              transition-all duration-300 ease-out shrink-0 flex items-center gap-1.5">
+              <span id="btn-favoritar-icone" class="text-lg leading-none" aria-hidden="true">⭐</span>
+              <span id="btn-favoritar-texto">Salvar</span>
+            </button>
+          </div>
+          <h3 id="apod-title" class="text-2xl font-light text-white tracking-tight mb-4">&nbsp;</h3>
+          <p id="apod-explanation" class="text-slate-400 text-sm leading-relaxed mb-3 line-clamp-6">&nbsp;</p>
+          <div id="apod-copyright" class="text-xs font-mono text-slate-600 tracking-wider"></div>
+        </div>
+      </div>
+    </section>
+  </main>
 
   <footer class="border-t border-white/5 py-6 text-center relative">
-    <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
-      NASA EXPLORER · 2026 · vanessa lima
-    </div>
+    <p class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
+      NASA EXPLORER · 2026 · Vanessa Lima
+    </p>
   </footer>
 
   <script type="module">
-    import { fetchApod, fetchNeoFeed } from './js/nasa.js';
-    import { criarFavorito, estaSalvo, deletarFavorito, listarFavoritos } from './js/parse.js';
-
-    const container = document.getElementById('apod-container');
-    const loading = document.getElementById('apod-loading');
-    const dateLabel = document.getElementById('apod-date-label');
-    const titleEl = document.getElementById('apod-title');
-    const explanationEl = document.getElementById('apod-explanation');
-    const copyrightEl = document.getElementById('apod-copyright');
-    const btnFavoritar = document.getElementById('btn-favoritar');
-    const btnTexto = document.getElementById('btn-favoritar-texto');
-
-    let apodAtual = null;
-    let idFavoritoSalvo = null;
-
-    async function carregarFotoDoDia() {
-      try {
-        const data = await fetchApod();
-        apodAtual = data;
-        const data_formatada = new Date(data.date + 'T00:00:00').toLocaleDateString('pt-BR', {
-          day: '2-digit', month: 'long', year: 'numeric'
-        });
-        dateLabel.textContent = `FOTO · ${data_formatada.toUpperCase()}`;
-
-        if (data.media_type === 'video') {
-          if (data.url.endsWith('.mp4')) {
-            container.innerHTML = `<video src="${data.url}" class="w-full h-full object-cover" autoplay muted loop playsinline controls></video>`;
-          } else {
-            container.innerHTML = `<iframe src="${data.url}" class="w-full h-full" allowfullscreen></iframe>`;
-          }
-        } else {
-          container.innerHTML = `<img src="${data.hdurl || data.url}" alt="${data.title}" class="w-full h-full object-cover" />`;
-        }
-
-        titleEl.textContent = data.title;
-        explanationEl.textContent = data.explanation;
-        if (data.copyright) copyrightEl.textContent = `© ${data.copyright.trim()}`;
-
-        btnFavoritar.classList.remove('hidden');
-        idFavoritoSalvo = await estaSalvo(data.date);
-        atualizarBotao();
-      } catch (erro) {
-        console.error(erro);
-        loading.innerHTML = `<div class="text-xs font-mono text-nasa">Erro ao carregar</div>`;
-      }
-    }
-
-    function atualizarBotao() {
-      if (idFavoritoSalvo) {
-        btnTexto.innerHTML = '★ Salvo';
-        btnFavoritar.classList.add('text-glow', 'border-glow/40');
-      } else {
-        btnTexto.innerHTML = '☆ Salvar';
-        btnFavoritar.classList.remove('text-glow', 'border-glow/40');
-      }
-    }
-
-    btnFavoritar.addEventListener('click', async () => {
-      if (!apodAtual) return;
-      btnFavoritar.disabled = true;
-      try {
-        if (idFavoritoSalvo) {
-          await deletarFavorito(idFavoritoSalvo);
-          idFavoritoSalvo = null;
-        } else {
-          const salvo = await criarFavorito({
-            tipo: 'apod', nasaId: apodAtual.date, titulo: apodAtual.title,
-            imageUrl: apodAtual.media_type === 'image' ? (apodAtual.hdurl || apodAtual.url) : ''
-          });
-          idFavoritoSalvo = salvo.id;
-        }
-        atualizarBotao();
-        carregarStatFavs();
-      } catch (e) { console.error(e); }
-      finally { btnFavoritar.disabled = false; }
-    });
-
-    async function carregarStatNeo() {
-      try {
-        const hoje = new Date().toISOString().split('T')[0];
-        const asteroides = await fetchNeoFeed(hoje, hoje);
-        document.getElementById('stat-neo').textContent = asteroides.length;
-      } catch { document.getElementById('stat-neo').textContent = '—'; }
-    }
-
-    async function carregarStatFavs() {
-      try {
-        const favs = await listarFavoritos();
-        document.getElementById('stat-favs').textContent = favs.length;
-      } catch { document.getElementById('stat-favs').textContent = '—'; }
-    }
-
-    carregarFotoDoDia();
-    carregarStatNeo();
-    carregarStatFavs();
+    import { iniciarInterface } from './js/ui.js';
+    import { iniciarHome } from './js/pages/home.js';
+    iniciarInterface();
+    iniciarHome();
   </script>
-
-  <script>
-    const spotlight = document.getElementById('spotlight');
-    if (spotlight) {
-      document.addEventListener('mousemove', (e) => {
-        spotlight.style.setProperty('--mouse-x', e.clientX + 'px');
-        spotlight.style.setProperty('--mouse-y', e.clientY + 'px');
-      });
-    }
-
-    const hamburgerBtn = document.getElementById('hamburger-btn');
-    const mobileMenu   = document.getElementById('mobile-menu');
-    if (hamburgerBtn && mobileMenu) {
-      hamburgerBtn.addEventListener('click', () => {
-        const isOpen = mobileMenu.classList.toggle('is-open');
-        hamburgerBtn.classList.toggle('is-open', isOpen);
-        hamburgerBtn.setAttribute('aria-expanded', isOpen);
-      });
-      mobileMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-          mobileMenu.classList.remove('is-open');
-          hamburgerBtn.classList.remove('is-open');
-          hamburgerBtn.setAttribute('aria-expanded', 'false');
-        });
-      });
-    }
-
-    document.querySelectorAll('.card-glow').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--card-x', (e.clientX - rect.left) + 'px');
-        card.style.setProperty('--card-y', (e.clientY - rect.top) + 'px');
-      });
-    });
-
-    const twEl = document.getElementById('hero-tw-text');
-    if (twEl) {
-      const phrases = [
-        'Fotos astronômicas diárias da NASA',
-        'Asteroides próximos da Terra em 3D',
-        '+150.000 imagens do acervo espacial',
-        'Sua coleção pessoal de favoritos',
-      ];
-      let phraseIdx = 0, charIdx = 0, deleting = false;
-      const SPEED_TYPE = 52, SPEED_DEL = 26, PAUSE = 2200;
-
-      function typeLoop() {
-        const phrase = phrases[phraseIdx];
-        if (!deleting) {
-          twEl.textContent = phrase.slice(0, ++charIdx);
-          if (charIdx === phrase.length) {
-            deleting = true;
-            setTimeout(typeLoop, PAUSE);
-            return;
-          }
-        } else {
-          twEl.textContent = phrase.slice(0, --charIdx);
-          if (charIdx === 0) {
-            deleting = false;
-            phraseIdx = (phraseIdx + 1) % phrases.length;
-          }
-        }
-        setTimeout(typeLoop, deleting ? SPEED_DEL : SPEED_TYPE);
-      }
-
-      setTimeout(typeLoop, 1200);
-    }
-  </script>
-
 </body>
 </html>

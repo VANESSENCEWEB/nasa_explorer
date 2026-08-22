@@ -3,162 +3,108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Image Library · NASA Explorer</title>
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a0e27" />
+  <meta name="author" content="Vanessa Rafaella Carneiro de Lima" />
+  <title>Image Library · Acervo da NASA · NASA Explorer</title>
 
-  <!-- Favicon -->
- <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
-<link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
-<link rel="manifest" href="./assets/favicon/site.webmanifest" />
+  <link rel="canonical" href="https://nasa-explorer-nine-rho.vercel.app/mars.html" />
+  <link rel="icon" type="image/png" href="./assets/favicon/favicon-96x96.png" sizes="96x96" />
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon/favicon.svg" />
+  <link rel="shortcut icon" href="./assets/favicon/favicon.ico" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
+  <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
- <!-- Descrição da página (SEO) -->
-  <meta name="description" content="Mais de 150 mil imagens do acervo oficial da NASA " />
+  <meta name="description" content="Busque em mais de 150 mil imagens do acervo oficial da NASA — missões, planetas, galáxias e história espacial." />
 
-  <!-- Open Graph (preview ao compartilhar no WhatsApp, LinkedIn, etc) -->
   <meta property="og:title" content="Image Library · NASA Explorer" />
-  <meta property="og:description" content="Galeria de imagens da NASA." />
+  <meta property="og:description" content="Galeria de imagens da NASA com busca em tempo real." />
   <meta property="og:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
-  <meta property="og:url" content="https://nasa-explorer-nine-rho.vercel.app/" />
+  <meta property="og:url" content="https://nasa-explorer-nine-rho.vercel.app/mars.html" />
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="NASA Explorer" />
+  <meta property="og:locale" content="pt_BR" />
 
-  <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Image Library · NASA Explorer" />
   <meta name="twitter:description" content="Galeria de imagens da NASA." />
   <meta name="twitter:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
 
-
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://images-api.nasa.gov" />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-  <!-- CSS global com video de fundo -->
-<link rel="stylesheet" href="./css/global.css" />
+  <link rel="stylesheet" href="./css/global.css" />
 
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="./js/tailwind-config.js"></script>
   <script src="https://unpkg.com/parse@8.6.0/dist/parse.min.js" integrity="sha384-mS6zsCyMgxxldn4JcapLdc0ezjREPuccmei8iMz5hIP4I8fykcTHK95bXrGZLytA" crossorigin="anonymous"></script>
-
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { nasa: '#fc3d21', glow: '#06b6d4' },
-          fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace']
-          }
-        }
-      }
-    };
-  </script>
-
-  <style>
-    body { background: #0a0e27; }
-
-    /* === MOBILE MENU (hamburger) === */
-    .mobile-menu {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-                  opacity 0.3s ease;
-      opacity: 0;
-    }
-    .mobile-menu.is-open {
-      max-height: 320px;
-      opacity: 1;
-    }
-    .ham-line {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background: #e2e8f0;
-      border-radius: 2px;
-      transition: transform 0.3s ease, opacity 0.25s ease;
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(1) {
-      transform: translateY(6px) rotate(45deg);
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(2) {
-      opacity: 0;
-      transform: scaleX(0);
-    }
-    #hamburger-btn.is-open .ham-line:nth-child(3) {
-      transform: translateY(-6px) rotate(-45deg);
-    }
-  </style>
 </head>
 
 <body class="font-sans text-slate-200 min-h-screen">
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-  <!-- Vídeo de fundo (galáxia) com overlay escuro -->
-<video class="bg-video" autoplay muted loop playsinline preload="auto" aria-hidden="true">
-  <source src="./assets/galaxy.mp4" type="video/mp4" />
-</video>
+  <video class="bg-video" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+    <source src="./assets/galaxy.mp4" type="video/mp4" />
+  </video>
   <div class="bg-overlay"></div>
+  <div class="spotlight" id="spotlight"></div>
 
-  <!-- Spotlight cursor (segue o mouse iluminando) -->
-<div class="spotlight" id="spotlight"></div>
-
-
-  <nav class="border-b border-white/10 py-4 relative">
-    <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
-      <a href="index.html" class="flex items-center gap-2.5 group">
-        <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
-          <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
-          <g>
-            <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
-            <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
-          </g>
-        </svg>
-        <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
-      </a>
-
-      <!-- Links desktop -->
-      <div class="hidden md:flex gap-7 text-xs">
-        <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
-        <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
-        <a href="mars.html" class="text-glow font-medium">Image Library</a>
-        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
+  <header>
+    <nav class="border-b border-white/10 py-4 relative" aria-label="Principal">
+      <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <a href="index.html" class="flex items-center gap-2.5 group">
+          <svg class="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="12" cy="12" r="9" fill="none" stroke="#fc3d21" stroke-width="0.5" opacity="0.35" stroke-dasharray="2 2"/>
+            <circle cx="12" cy="12" r="3.5" fill="#fc3d21"/>
+            <g>
+              <circle cx="21" cy="12" r="1.5" fill="#fc3d21"/>
+              <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="4s" repeatCount="indefinite"/>
+            </g>
+          </svg>
+          <span class="font-medium text-xs tracking-[0.18em] text-white">NASA EXPLORER</span>
+        </a>
+        <div class="hidden md:flex gap-7 text-xs">
+          <a href="index.html" class="text-slate-400 hover:text-white transition-colors">Home</a>
+          <a href="neo.html" class="text-slate-400 hover:text-white transition-colors">NEO Watch</a>
+          <a href="mars.html" class="text-glow font-medium" aria-current="page">Image Library</a>
+          <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors">Favoritos</a>
+        </div>
+        <button type="button" id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-menu">
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+          <span class="ham-line"></span>
+        </button>
       </div>
-
-      <!-- Hamburger (mobile) -->
-      <button id="hamburger-btn" class="flex md:hidden flex-col gap-[5px] p-1.5 -mr-1" aria-label="Abrir menu" aria-expanded="false">
-        <span class="ham-line"></span>
-        <span class="ham-line"></span>
-        <span class="ham-line"></span>
-      </button>
+    </nav>
+    <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
+        <a href="index.html" class="text-slate-400 hover:text-white transition-colors text-sm">Home</a>
+        <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
+        <a href="mars.html" class="text-glow font-medium text-sm tracking-wide" aria-current="page">Image Library</a>
+        <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
+      </div>
     </div>
-  </nav>
+  </header>
 
-  <!-- Mobile Menu -->
-  <div id="mobile-menu" class="mobile-menu md:hidden border-b border-white/10 bg-black/90 backdrop-blur-xl">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col gap-5">
-      <a href="index.html" class="text-slate-400 hover:text-white transition-colors text-sm">Home</a>
-      <a href="neo.html" class="text-slate-400 hover:text-white transition-colors text-sm">NEO Watch</a>
-      <a href="mars.html" class="text-glow font-medium text-sm tracking-wide">Image Library</a>
-      <a href="favoritos.html" class="text-slate-400 hover:text-white transition-colors text-sm">Favoritos</a>
-    </div>
-  </div>
-
-  <main class="max-w-6xl mx-auto px-6 py-12">
-
-    <div class="text-[11px] text-glow tracking-[0.2em] mb-3">NASA IMAGE LIBRARY</div>
+  <main id="conteudo" class="max-w-6xl mx-auto px-6 py-12">
+    <p class="text-[11px] text-glow tracking-[0.2em] mb-3">NASA IMAGE LIBRARY</p>
     <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
       Galeria de imagens da NASA
     </h1>
     <p class="text-slate-400 leading-relaxed max-w-3xl mb-8">
       Mais de 150 mil imagens do acervo oficial da NASA — missões espaciais,
       planetas, galáxias e momentos históricos da exploração. Use a busca
-      abaixo pra pesquisar o que quiser.
+      abaixo para pesquisar o que quiser.
     </p>
 
-    <form id="form-busca" class="flex gap-2 mb-3 max-w-2xl">
+    <form id="form-busca" class="flex gap-2 mb-3 max-w-2xl" role="search">
+      <label class="sr-only" for="campo-busca">Buscar imagens da NASA</label>
       <input
-        type="text"
+        type="search"
         id="campo-busca"
+        name="q"
+        autocomplete="off"
         placeholder="Buscar... ex: apollo 11, mars rover, jupiter, nebula"
         class="flex-1 bg-white/[0.03] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-glow transition-colors"
       />
@@ -169,180 +115,32 @@
 
     <div class="flex flex-wrap gap-2 mb-8">
       <span class="text-[10px] font-mono text-slate-500 tracking-widest uppercase mr-1 self-center">Populares:</span>
-      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="mars rover">mars rover</button>
-      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="apollo 11">apollo 11</button>
-      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="jupiter">jupiter</button>
-      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="nebula">nebula</button>
-      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="saturn">saturn</button>
-      <button class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="iss">ISS</button>
+      <button type="button" class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="mars rover">mars rover</button>
+      <button type="button" class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="apollo 11">apollo 11</button>
+      <button type="button" class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="jupiter">jupiter</button>
+      <button type="button" class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="nebula">nebula</button>
+      <button type="button" class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="saturn">saturn</button>
+      <button type="button" class="sugestao text-[11px] bg-white/[0.04] border border-white/10 text-slate-300 px-2.5 py-1 rounded-full hover:bg-white/10 hover:text-white transition" data-termo="iss">ISS</button>
     </div>
 
-    <div id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6">
+    <p id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6" aria-live="polite">
       CARREGANDO IMAGENS...
-    </div>
+    </p>
 
-    <section id="galeria" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12">
-    </section>
-
+    <section id="galeria" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-12" aria-label="Resultados da busca"></section>
   </main>
 
   <footer class="border-t border-white/5 py-6 text-center">
-    <div class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
-      NASA EXPLORER · 2026
-    </div>
+    <p class="text-[10px] font-mono text-slate-600 tracking-[0.15em]">
+      NASA EXPLORER · 2026 · Vanessa Lima
+    </p>
   </footer>
 
   <script type="module">
-    import { buscarImagensNasa } from './js/nasa.js';
-    import { criarFavorito, estaSalvo, deletarFavorito } from './js/parse.js';
-
-    const form = document.getElementById('form-busca');
-    const campo = document.getElementById('campo-busca');
-    const info = document.getElementById('info');
-    const galeria = document.getElementById('galeria');
-    const sugestoes = document.querySelectorAll('.sugestao');
-
-    // Mapa de quais itens estão favoritados (nasaId → id do favorito).
-    const favoritados = new Map();
-
-    async function buscar(termo) {
-      info.textContent = `BUSCANDO POR "${termo}"...`;
-      galeria.innerHTML = '';
-
-      try {
-        const itens = await buscarImagensNasa(termo);
-
-        if (itens.length === 0) {
-          info.innerHTML = `<span class="text-slate-400">Nenhuma imagem encontrada pra "${termo}". Tenta outra busca.</span>`;
-          return;
-        }
-
-        const itensMostrados = itens.slice(0, 24);
-        info.textContent = `${itensMostrados.length} DE ${itens.length} IMAGENS · BUSCA: "${termo}"`;
-
-        // Checa quais já estão favoritados.
-        favoritados.clear();
-        await Promise.all(itensMostrados.map(async i => {
-          const id = await estaSalvo(i.id);
-          if (id) favoritados.set(i.id, id);
-        }));
-
-        galeria.innerHTML = itensMostrados.map(i => {
-          const salvo = favoritados.has(i.id);
-          return `
-            <div class="group relative bg-white/[0.03] border border-white/10 rounded-xl overflow-hidden hover:border-white/30 transition-colors">
-              <img src="${i.imagem}" alt="${i.titulo}" loading="lazy" class="w-full aspect-square object-cover" />
-
-              <button
-                class="btn-fav absolute top-2 right-2 w-8 h-8 rounded-full bg-black/60 backdrop-blur border border-white/20 flex items-center justify-center text-sm hover:bg-black/80 transition ${salvo ? 'text-glow' : 'text-white'}"
-                data-nasa-id="${i.id}"
-                data-titulo="${i.titulo.replace(/"/g, '&quot;')}"
-                data-imagem="${i.imagem}"
-                title="Favoritar"
-              >${salvo ? '★' : '☆'}</button>
-
-              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div class="text-[10px] font-mono text-glow tracking-widest mb-1">${i.data}</div>
-                <div class="text-xs text-white line-clamp-2">${i.titulo}</div>
-              </div>
-            </div>
-          `;
-        }).join('');
-
-        // Adiciona eventos nos botões de favoritar.
-        document.querySelectorAll('.btn-fav').forEach(btn => {
-          btn.addEventListener('click', async () => {
-            const nasaId = btn.dataset.nasaId;
-            const titulo = btn.dataset.titulo;
-            const imagem = btn.dataset.imagem;
-
-            btn.disabled = true;
-
-            try {
-              if (favoritados.has(nasaId)) {
-                await deletarFavorito(favoritados.get(nasaId));
-                favoritados.delete(nasaId);
-                btn.textContent = '☆';
-                btn.classList.remove('text-glow');
-                btn.classList.add('text-white');
-              } else {
-                const salvo = await criarFavorito({
-                  tipo: 'image',
-                  nasaId,
-                  titulo,
-                  imageUrl: imagem
-                });
-                favoritados.set(nasaId, salvo.id);
-                btn.textContent = '★';
-                btn.classList.add('text-glow');
-                btn.classList.remove('text-white');
-              }
-            } catch (e) {
-              console.error(e);
-            } finally {
-              btn.disabled = false;
-            }
-          });
-        });
-
-      } catch (erro) {
-        console.error(erro);
-        info.innerHTML = `<span class="text-nasa">ERRO · ${erro.message}</span>`;
-      }
-    }
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const termo = campo.value.trim();
-      if (termo) buscar(termo);
-    });
-
-    sugestoes.forEach(btn => {
-      btn.addEventListener('click', () => {
-        const termo = btn.dataset.termo;
-        campo.value = termo;
-        buscar(termo);
-      });
-    });
-
-    buscar('mars rover');
+    import { iniciarInterface } from './js/ui.js';
+    import { iniciarLibrary } from './js/pages/library.js';
+    iniciarInterface();
+    iniciarLibrary();
   </script>
-<script>
-  // Faz o spotlight (luz do mouse) seguir o cursor pela página.
-  const spotlight = document.getElementById('spotlight');
-  if (spotlight) {
-    document.addEventListener('mousemove', (e) => {
-      spotlight.style.setProperty('--mouse-x', e.clientX + 'px');
-      spotlight.style.setProperty('--mouse-y', e.clientY + 'px');
-    });
-  }
-
-  // Hamburger menu toggle
-  const hamburgerBtn = document.getElementById('hamburger-btn');
-  const mobileMenu   = document.getElementById('mobile-menu');
-  if (hamburgerBtn && mobileMenu) {
-    hamburgerBtn.addEventListener('click', () => {
-      const isOpen = mobileMenu.classList.toggle('is-open');
-      hamburgerBtn.classList.toggle('is-open', isOpen);
-      hamburgerBtn.setAttribute('aria-expanded', isOpen);
-    });
-    mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        mobileMenu.classList.remove('is-open');
-        hamburgerBtn.classList.remove('is-open');
-        hamburgerBtn.setAttribute('aria-expanded', 'false');
-      });
-    });
-  }
-
-  // Glow nos cards: gradient segue o mouse dentro do card.
-  document.querySelectorAll('.card-glow').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty('--card-x', (e.clientX - rect.left) + 'px');
-      card.style.setProperty('--card-y', (e.clientY - rect.top) + 'px');
-    });
-  });
-</script>
 </body>
 </html>
