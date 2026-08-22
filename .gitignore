@@ -12,3 +12,6 @@ Thumbs.db
 # variáveis de ambiente
 .env
 .env.local
+
+# Node
+node_modules/

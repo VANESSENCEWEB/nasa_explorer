@@ -131,8 +131,9 @@ Neste vídeo de 4 minutos, eu apresento o projeto ao vivo — passando por cada 
 <td width="33%">
 
 **Infra & Qualidade**
-- Vercel (deploy)
+- Vercel (deploy + API serverless)
 - GitHub (versionamento)
+- Vitest + GitHub Actions (testes)
 - SonarQube (qualidade)
 - Subresource Integrity (SRI)
 
@@ -182,9 +183,9 @@ A API Mars Rover Photos foi **descontinuada durante o desenvolvimento** (erro "N
 </details>
 
 <details>
-<summary><b>3. Chave da API NASA visível no client-side</b></summary>
+<summary><b>3. Chave da API NASA no servidor</b></summary>
 
-Como projeto acadêmico com escopo definido, aceitei o trade-off. A chave da NASA API é apenas **rate-limiting** (não protege dados sensíveis), então não há vulnerabilidade real. **Em produção**, ficaria atrás de uma serverless function.
+A chave da NASA API é só **rate-limiting**, mas no client ela aparece no DevTools. Em produção as rotas APOD e NEO passam por `/api/nasa` na Vercel. Configure `NASA_API_KEY` no painel da Vercel (há um `.env.example` no repositório). No `python -m http.server` local, o proxy não existe e o app cai na `DEMO_KEY` pública da NASA.
 
 </details>
 
@@ -235,7 +236,7 @@ Cada commit resolve **uma única issue**, seguindo Conventional Commits. O hist�
 
 Além do SonarQube, a base foi reorganizada para portfolio:
 
-- JS duplicado (menu, spotlight, Tailwind config) extraído para módulos compartilhados
+- JS duplicado (menu, spotlight) extraído para módulos compartilhados
 - HTML das páginas sem scripts inline longos
 - Escape de HTML em dados das APIs (XSS)
 - SRI no Parse SDK e no Chart.js
@@ -243,6 +244,8 @@ Além do SonarQube, a base foi reorganizada para portfolio:
 - Screenshots do README comprimidos (~8 MB de PNG → ~560 KB de JPEG)
 - Manifest PWA com nome, cores e caminhos de ícone corretos
 - Página 404, `robots.txt` e `sitemap.xml`
+- Tailwind compilado (sem CDN de desenvolvimento)
+- Proxy serverless da NASA API + testes Vitest no CI
 
 ## 🎓 O que este projeto demonstra
 
@@ -252,13 +255,14 @@ Além do SonarQube, a base foi reorganizada para portfolio:
 - ✅ **Visualizações complexas** — Three.js (3D) e Chart.js (dados)
 - ✅ **UX cuidada** — efeitos visuais, lightbox, toasts, responsividade, animações não-intrusivas
 - ✅ **Qualidade de código** — SonarQube, SRI, sanitização XSS, módulos ES, acessibilidade
+- ✅ **Testes e CI** — Vitest no GitHub Actions
 - ✅ **SEO e compartilhamento** — canonical, Open Graph, JSON-LD, sitemap, robots.txt
 - ✅ **Metodologia profissional** — git com histórico limpo, um commit por feature
 - ✅ **Documentação** — README completo, decisões técnicas explicadas, versionada
 
 ## 🚀 Rodando localmente
 
-**Requisitos**: navegador moderno + qualquer servidor HTTP local (não há build).
+**Requisitos**: navegador moderno + qualquer servidor HTTP local.
 
 ```bash
 # 1. Clone o repositório
@@ -276,25 +280,39 @@ php -S localhost:5500              # PHP
 # http://localhost:5500/
 ```
 
-> **⚡ Sem dependências**: tudo carrega via CDN (Tailwind, Parse SDK, Chart.js, Three.js). Zero `npm install`, zero build step.
+O app **não precisa de `npm install`** para rodar: CSS já vai compilado no repositório. APOD/NEO no `python -m http.server` usam a `DEMO_KEY` da NASA; no deploy da Vercel passam pelo proxy `/api/nasa`.
+
+Na Vercel, em **Settings → Environment Variables**, crie `NASA_API_KEY` (Production e Preview) com a chave de [api.nasa.gov](https://api.nasa.gov). Depois disso, vale rotacionar a chave antiga.
+
+```bash
+# Opcional — testes e rebuild do CSS
+npm install
+npm test
+npm run build:css    # só se você alterar classes Tailwind
+```
 
 ## 📂 Estrutura
 
 ```
 nasa_explorer/
+├── api/
+│   └── nasa.js            # Proxy serverless da NASA (APOD + NEO)
 ├── assets/
 │   ├── favicon/           # Ícones + web manifest
 │   ├── galaxy.mp4         # Vídeo de fundo (930KB, otimizado)
 │   └── og-image.png       # Preview para redes sociais
 ├── css/
-│   └── global.css         # Estilos compartilhados (layout, a11y, lightbox)
+│   ├── input.css          # Entrada do Tailwind
+│   ├── utilities.css      # Tailwind compilado
+│   └── global.css         # Estilos do projeto (layout, a11y, lightbox)
 ├── js/
 │   ├── ui.js              # Menu, spotlight, toasts, lightbox
 │   ├── dom.js             # Helpers de sanitização e a11y
 │   ├── nasa.js            # Cliente das APIs da NASA
 │   ├── parse.js           # Cliente do Back4app (CRUD)
 │   ├── earthScene.js      # Cena 3D da Terra com Three.js
-│   └── pages/             # Lógica de cada página (home, neo, library, favoritos)
+│   └── pages/             # Lógica de cada página
+├── tests/                 # Vitest (normalização de APIs + sanitização)
 ├── index.html             # Home + APOD
 ├── neo.html               # Asteroides + Terra 3D + Charts
 ├── mars.html              # Image Library com busca
@@ -310,9 +328,9 @@ nasa_explorer/
 Ideias exploradas para próximas versões (contribuições e forks são bem-vindos):
 
 - [ ] Autenticação com Parse Users (favoritos privados por usuário)
-- [ ] Mover chave da NASA API para serverless function na Vercel
-- [ ] Migrar Tailwind CDN para build local (Vite + PostCSS)
-- [ ] Adicionar testes automatizados (Vitest + Playwright)
+- [x] Mover chave da NASA API para serverless function na Vercel
+- [x] Migrar Tailwind CDN para CSS compilado
+- [x] Adicionar testes automatizados (Vitest + GitHub Actions)
 - [ ] PWA com service worker para uso offline
 - [ ] Modo escuro / claro (atualmente só escuro)
 - [ ] Internacionalização (PT-BR / EN)
