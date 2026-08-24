@@ -113,13 +113,20 @@ export async function listarFavoritos() {
   const user = usuarioAtual();
   if (!user) return [];
 
-  const query = criarQuery();
-  query.equalTo('user', user);
-  query.descending('createdAt');
-  query.limit(100);
+  try {
+    const query = criarQuery();
+    query.equalTo('user', user);
+    query.descending('createdAt');
+    query.limit(100);
 
-  const resultados = await query.find();
-  return resultados.map(paraFavoritoSimples);
+    const resultados = await query.find();
+    return resultados.map(paraFavoritoSimples);
+  } catch (error) {
+    if (error?.code === 119) {
+      throw new Error('Sem permissão para ler favoritos. No Back4app, em Favorite → Security, marque Find e Get em Authenticated.');
+    }
+    throw error;
+  }
 }
 
 export async function atualizarNota(id, novaNota) {
@@ -144,10 +151,15 @@ export async function estaSalvo(nasaId) {
   const user = usuarioAtual();
   if (!user) return null;
 
-  const query = criarQuery();
-  query.equalTo('user', user);
-  query.equalTo('nasaId', nasaId);
+  try {
+    const query = criarQuery();
+    query.equalTo('user', user);
+    query.equalTo('nasaId', nasaId);
 
-  const encontrado = await query.first();
-  return encontrado ? encontrado.id : null;
+    const encontrado = await query.first();
+    return encontrado ? encontrado.id : null;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
 }
