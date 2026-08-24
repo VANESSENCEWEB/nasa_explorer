@@ -15,10 +15,10 @@
   <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png" />
   <link rel="manifest" href="./assets/favicon/site.webmanifest" />
 
-  <meta name="description" content="Entre na sua conta para ver a coleção pessoal de favoritos do NASA Explorer — privada, com CRUD no Back4app." />
+  <meta name="description" content="Cadastre-se no NASA Explorer para salvar fotos, asteroides e imagens da NASA numa coleção privada — e-mail, senha e CRUD no Back4app." />
 
   <meta property="og:title" content="Favoritos · NASA Explorer" />
-  <meta property="og:description" content="Coleção pessoal salva no Back4app com CRUD completo." />
+  <meta property="og:description" content="Cadastre-se para salvar fotos e asteroides da NASA numa coleção privada." />
   <meta property="og:image" content="https://nasa-explorer-nine-rho.vercel.app/assets/og-image.png" />
   <meta property="og:url" content="https://nasa-explorer-nine-rho.vercel.app/favoritos.html" />
   <meta property="og:type" content="website" />
@@ -88,43 +88,80 @@
   </header>
 
   <main id="conteudo" class="max-w-6xl mx-auto px-6 py-12">
-    <p class="text-[11px] text-glow tracking-[0.2em] mb-3">MEUS FAVORITOS</p>
-    <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-6">
-      Coleção pessoal
-    </h1>
-    <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
-      Cada conta tem seus próprios favoritos. Entre para ver, anotar e remover
-      o que você salvou — os dados ficam no <strong>Back4app</strong> e não
-      misturam com os de outras pessoas.
-    </p>
+    <div id="intro-visitante">
+      <p class="text-[11px] text-glow tracking-[0.2em] mb-3">CONTA GRÁTIS</p>
+      <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-4">
+        Cadastre-se e salve seus favoritos
+      </h1>
+      <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
+        Crie uma conta com e-mail e senha. Depois clique na estrela nas fotos,
+        asteroides e imagens — tudo o que você salvar aparece aqui, só para você.
+      </p>
+    </div>
 
-    <section id="painel-auth" class="auth-card hidden max-w-md" aria-labelledby="auth-titulo">
-      <h2 id="auth-titulo" class="text-white text-lg font-medium mb-1">Acesse sua coleção</h2>
-      <p class="text-slate-500 text-xs mb-5">E-mail e senha. Sem redes sociais, só Parse Users.</p>
+    <div id="intro-logado" class="hidden">
+      <p class="text-[11px] text-glow tracking-[0.2em] mb-3">MEUS FAVORITOS</p>
+      <h1 class="text-3xl md:text-4xl font-light text-white tracking-tight mb-4">
+        Sua coleção
+      </h1>
+      <p class="text-slate-400 leading-relaxed max-w-3xl mb-10">
+        Anote o que quiser em cada item e remova quando não precisar mais.
+        Ninguém mais vê o que está nesta conta.
+      </p>
+    </div>
 
-      <div class="auth-tabs" role="tablist" aria-label="Entrar ou criar conta">
-        <button type="button" id="tab-entrar" class="auth-tab is-active" role="tab" aria-selected="true">Entrar</button>
-        <button type="button" id="tab-cadastrar" class="auth-tab" role="tab" aria-selected="false">Criar conta</button>
-      </div>
+    <div id="painel-auth" class="auth-layout hidden">
+      <ol class="auth-steps" aria-label="Como funciona">
+        <li>
+          <span class="auth-step-num" aria-hidden="true">1</span>
+          <span><strong class="text-slate-200">Cadastre-se</strong> com e-mail e uma senha de pelo menos 6 caracteres. Leva menos de um minuto.</span>
+        </li>
+        <li>
+          <span class="auth-step-num" aria-hidden="true">2</span>
+          <span><strong class="text-slate-200">Explore</strong> a foto do dia, os asteroides ou a galeria e clique na estrela para guardar.</span>
+        </li>
+        <li>
+          <span class="auth-step-num" aria-hidden="true">3</span>
+          <span><strong class="text-slate-200">Volte aqui</strong> para ver a coleção, escrever uma nota pessoal e remover o que quiser.</span>
+        </li>
+      </ol>
 
-      <form id="form-auth" class="flex flex-col gap-3">
-        <label class="auth-label" for="auth-email">E-mail</label>
-        <input type="email" id="auth-email" name="email" required autocomplete="username" class="auth-input" />
+      <section class="auth-card" aria-labelledby="auth-titulo">
+        <h2 id="auth-titulo" class="text-white text-lg font-medium mb-1">Criar conta</h2>
+        <p id="auth-subtitulo" class="text-slate-500 text-xs mb-5">
+          E-mail e senha. Sem Google, sem redes sociais — a coleção fica só sua.
+        </p>
 
-        <label class="auth-label" for="auth-senha">Senha</label>
-        <input type="password" id="auth-senha" name="password" required minlength="6" autocomplete="current-password" class="auth-input" />
-
-        <div id="auth-confirma-wrap" class="hidden">
-          <label class="auth-label" for="auth-confirma">Confirmar senha</label>
-          <input type="password" id="auth-confirma" name="confirm" minlength="6" autocomplete="new-password" class="auth-input" />
+        <div class="auth-tabs" role="tablist" aria-label="Entrar ou criar conta">
+          <button type="button" id="tab-entrar" class="auth-tab" role="tab" aria-selected="false">Já tenho conta</button>
+          <button type="button" id="tab-cadastrar" class="auth-tab is-active" role="tab" aria-selected="true">Cadastre-se</button>
         </div>
 
-        <p id="auth-erro" class="hidden text-xs text-nasa" role="alert"></p>
-        <button type="submit" id="btn-auth" class="bg-nasa text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition mt-1">
-          Entrar
-        </button>
-      </form>
-    </section>
+        <form id="form-auth" class="flex flex-col gap-3">
+          <label class="auth-label" for="auth-email">E-mail</label>
+          <input type="email" id="auth-email" name="email" required autocomplete="email" inputmode="email" spellcheck="false" placeholder="voce@email.com" class="auth-input" />
+
+          <label class="auth-label" for="auth-senha">Senha</label>
+          <input type="password" id="auth-senha" name="password" required minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres" class="auth-input" />
+
+          <div id="auth-confirma-wrap">
+            <label class="auth-label" for="auth-confirma">Confirmar senha</label>
+            <input type="password" id="auth-confirma" name="confirm" minlength="6" autocomplete="new-password" class="auth-input" />
+          </div>
+
+          <label class="auth-showpw">
+            <input type="checkbox" id="auth-mostrar-senha" />
+            Mostrar senha
+          </label>
+
+          <p id="auth-dica" class="auth-hint">Depois do cadastro você já entra e pode começar a salvar.</p>
+          <p id="auth-erro" class="hidden text-xs text-nasa" role="alert"></p>
+          <button type="submit" id="btn-auth" class="bg-nasa text-white rounded-lg px-5 py-2.5 text-sm font-medium hover:bg-nasa/90 active:scale-[0.97] transition mt-1">
+            Criar conta e salvar favoritos
+          </button>
+        </form>
+      </section>
+    </div>
 
     <div id="painel-colecao" class="hidden">
       <p id="info" class="text-xs font-mono text-slate-500 tracking-[0.15em] mb-6" aria-live="polite">
@@ -134,12 +171,12 @@
       <section id="lista" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Favoritos salvos"></section>
 
       <div id="vazio" class="hidden text-center py-20">
-        <p class="text-slate-500 text-sm mb-2">Nenhum favorito nesta conta ainda.</p>
-        <p class="text-slate-600 text-xs">
-          Vá até <a href="index.html" class="text-glow hover:underline">Home</a>,
-          <a href="neo.html" class="text-glow hover:underline">NEO Watch</a> ou
-          <a href="mars.html" class="text-glow hover:underline">Image Library</a>
-          e clique nas estrelas para começar.
+        <p class="text-slate-300 text-sm mb-2">Sua coleção ainda está vazia.</p>
+        <p class="text-slate-500 text-sm max-w-md mx-auto leading-relaxed">
+          Abra a <a href="index.html" class="text-glow hover:underline">foto do dia</a>,
+          um <a href="neo.html" class="text-glow hover:underline">asteroide</a> ou
+          a <a href="mars.html" class="text-glow hover:underline">galeria</a>
+          e clique na estrela. O item volta para cá, com espaço para a sua nota.
         </p>
       </div>
     </div>
