@@ -97,7 +97,11 @@ function rotuloUsuario(user) {
 
 function htmlAuth(user, compacto) {
   if (!user) {
-    return `<a href="favoritos.html" class="${compacto ? 'text-glow text-sm' : 'text-[11px] font-mono tracking-widest uppercase text-glow border border-glow/30 rounded px-2.5 py-1 hover:bg-glow/10 transition'}">Entrar</a>`;
+    const classes = compacto
+      ? 'text-glow text-sm'
+      : 'text-[11px] font-mono tracking-widest uppercase text-glow border border-glow/30 rounded px-2.5 py-1 hover:bg-glow/10 transition';
+    const rotulo = compacto ? 'Cadastre-se para salvar favoritos' : 'Cadastre-se';
+    return `<a href="favoritos.html#cadastrar" class="${classes}" aria-label="Cadastre-se para salvar seus favoritos">${rotulo}</a>`;
   }
 
   const nome = rotuloUsuario(user);
@@ -134,8 +138,8 @@ export function lidarErroFavorito(erro) {
   if (erro instanceof AuthNecessariaError) {
     mostrarToast(erro.message, 'erro');
     window.setTimeout(() => {
-      window.location.href = 'favoritos.html';
-    }, 700);
+      window.location.href = 'favoritos.html#cadastrar';
+    }, 1400);
     return true;
   }
   return false;
@@ -160,7 +164,7 @@ export function mostrarToast(mensagem, tipo = 'info') {
   window.setTimeout(() => {
     toast.remove();
     if (stack && !stack.children.length) stack.remove();
-  }, 3200);
+  }, 4500);
 }
 
 export function abrirLightbox({ src, alt = '', caption = '' }) {

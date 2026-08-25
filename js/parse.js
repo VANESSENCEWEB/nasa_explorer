@@ -11,7 +11,7 @@ let Favorite = null;
 
 export class AuthNecessariaError extends Error {
   constructor() {
-    super('Entre na sua conta para usar os favoritos.');
+    super('Cadastre-se para salvar seus favoritos. É grátis — a coleção fica só na sua conta.');
     this.name = 'AuthNecessariaError';
     this.code = 'AUTH_REQUIRED';
   }

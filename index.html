@@ -145,6 +145,11 @@
             Sobre o projeto
           </a>
         </div>
+        <p class="text-xs text-slate-500 mt-5 fade-up max-w-lg mx-auto leading-relaxed" style="animation-delay: 0.65s;">
+          Gostou de uma foto ou de um asteroide?
+          <a href="favoritos.html#cadastrar" class="text-glow hover:underline">Cadastre-se e salve nos favoritos</a>
+          — é grátis e a coleção fica só na sua conta.
+        </p>
 
         <div class="flex flex-col items-center gap-2 mt-20 fade-up" style="animation-delay: 0.8s;" aria-hidden="true">
           <div class="scroll-hint-line"></div>
@@ -174,8 +179,8 @@
           <p class="text-xs text-slate-300 leading-relaxed">NASA APOD, NASA NEO Feed e NASA Image Library — todas consumidas em tempo real.</p>
         </div>
         <div class="card-dark rounded-xl p-4">
-          <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">CRUD Completo</h3>
-          <p class="text-xs text-slate-300 leading-relaxed">Criação, leitura, atualização e remoção de favoritos privados por conta no Back4app.</p>
+          <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Conta + favoritos</h3>
+          <p class="text-xs text-slate-300 leading-relaxed">Cadastre-se com e-mail, clique na estrela e gerencie (ver, anotar, remover) uma coleção só sua no Back4app.</p>
         </div>
         <div class="card-dark rounded-xl p-4">
           <h3 class="text-[10px] font-mono text-glow tracking-widest uppercase mb-2">Acadêmico</h3>
@@ -231,7 +236,7 @@
         <a href="favoritos.html" class="card-glow card-dark group rounded-xl p-5 block">
           <div class="text-2xl mb-3" aria-hidden="true">★</div>
           <h3 class="text-white text-base font-medium mb-1.5">Favoritos</h3>
-          <p class="text-xs text-slate-400 leading-relaxed mb-3">Coleção salva no Back4app. CRUD completo.</p>
+          <p class="text-xs text-slate-400 leading-relaxed mb-3">Cadastre-se, salve fotos e asteroides com a estrela, anote e remova — tudo privado na sua conta.</p>
           <div class="text-[11px] font-mono text-glow tracking-widest">ABRIR →</div>
         </a>
       </div>
@@ -242,6 +247,8 @@
       <h2 class="section-title">Foto astronômica</h2>
       <p class="section-description">
         Atualizada todos os dias pela NASA. Pode ser uma foto ou um vídeo.
+        Clique em <strong class="text-slate-300">Salvar</strong> para guardar na sua coleção
+        — se ainda não tiver conta, a gente te leva para o cadastro.
       </p>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
         <div id="apod-container" class="relative rounded-xl overflow-hidden bg-black border border-white/10 aspect-video">
@@ -266,6 +273,10 @@
           <h3 id="apod-title" class="text-2xl font-light text-white tracking-tight mb-4">&nbsp;</h3>
           <p id="apod-explanation" class="text-slate-400 text-sm leading-relaxed mb-3 line-clamp-6">&nbsp;</p>
           <div id="apod-copyright" class="text-xs font-mono text-slate-600 tracking-wider"></div>
+          <p class="text-[11px] text-slate-500 mt-3 leading-relaxed">
+            A estrela guarda a foto na sua conta. Se você ainda não cadastrou,
+            o clique abre a tela para criar uma (e-mail e senha).
+          </p>
         </div>
       </div>
     </section>

@@ -33,8 +33,14 @@ export function iniciarFavoritos() {
   const campoConfirma = $('auth-confirma');
   const authErro = $('auth-erro');
   const btnAuth = $('btn-auth');
+  const authTitulo = $('auth-titulo');
+  const authSubtitulo = $('auth-subtitulo');
+  const authDica = $('auth-dica');
+  const introVisitante = $('intro-visitante');
+  const introLogado = $('intro-logado');
+  const mostrarSenha = $('auth-mostrar-senha');
 
-  let modoCadastro = false;
+  let modoCadastro = window.location.hash !== '#entrar';
 
   function mostrarErroAuth(texto) {
     authErro.textContent = texto;
@@ -53,8 +59,30 @@ export function iniciarFavoritos() {
     tabCadastrar.setAttribute('aria-selected', String(modoCadastro));
     wrapConfirma.classList.toggle('hidden', !modoCadastro);
     campoConfirma.required = modoCadastro;
-    btnAuth.textContent = modoCadastro ? 'Criar conta' : 'Entrar';
+    campoEmail.autocomplete = modoCadastro ? 'email' : 'username';
     campoSenha.autocomplete = modoCadastro ? 'new-password' : 'current-password';
+    if (authTitulo) {
+      authTitulo.textContent = modoCadastro ? 'Criar conta' : 'Entrar na sua coleção';
+    }
+    if (authSubtitulo) {
+      authSubtitulo.textContent = modoCadastro
+        ? 'E-mail e senha. Sem Google, sem redes sociais — a coleção fica só sua.'
+        : 'Use o mesmo e-mail do cadastro para ver os favoritos desta conta.';
+    }
+    if (authDica) {
+      authDica.textContent = modoCadastro
+        ? 'Depois do cadastro você já entra e pode começar a salvar.'
+        : 'Esqueceu a senha? Por enquanto é preciso criar outra conta — anote a senha num lugar seguro.';
+    }
+    if (btnAuth) {
+      btnAuth.textContent = modoCadastro
+        ? 'Criar conta e salvar favoritos'
+        : 'Entrar e ver meus favoritos';
+    }
+    const hash = modoCadastro ? '#cadastrar' : '#entrar';
+    if (window.location.hash !== hash) {
+      history.replaceState(null, '', hash);
+    }
     limparErroAuth();
   }
 
@@ -67,6 +95,14 @@ export function iniciarFavoritos() {
     modoCadastro = true;
     atualizarAbas();
   });
+
+  if (mostrarSenha) {
+    mostrarSenha.addEventListener('change', () => {
+      const tipo = mostrarSenha.checked ? 'text' : 'password';
+      campoSenha.type = tipo;
+      campoConfirma.type = tipo;
+    });
+  }
 
   formAuth.addEventListener('submit', async (evento) => {
     evento.preventDefault();
@@ -106,11 +142,15 @@ export function iniciarFavoritos() {
     if (!user) {
       painelAuth.classList.remove('hidden');
       painelColecao.classList.add('hidden');
+      introVisitante?.classList.remove('hidden');
+      introLogado?.classList.add('hidden');
       return;
     }
 
     painelAuth.classList.add('hidden');
     painelColecao.classList.remove('hidden');
+    introVisitante?.classList.add('hidden');
+    introLogado?.classList.remove('hidden');
 
     try {
       const favoritos = await listarFavoritos();
