@@ -1,7 +1,18 @@
+> Este repositório foi migrado de uma conta anterior minha (vanessa-lima-web), usada em
+> alguns projetos da faculdade. Autoria e desenvolvimento são meus.
+
+
+
+
+
 <div align="center">
 
 
+
+
 # 🚀 NASA Explorer
+
+
 
 **Dashboard interativo que conecta você ao acervo da NASA em tempo real**
 
